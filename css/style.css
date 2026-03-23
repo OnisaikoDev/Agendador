@@ -1,0 +1,201 @@
+ html {
+    background-color: rosybrown;
+    font-family: Arial, Helvetica, sans-serif;
+ }
+ 
+ body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-image: url(../img/ChatGPT\ Image\ 23\ de\ mar.\ de\ 2026\,\ 11_54_16.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+ }
+  
+ form {
+    width: 350px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 5px 5px 15px #E94B6A;
+    }
+
+ fieldset {
+    border: none;
+    border-radius: 20px;
+ }
+ 
+
+ input,
+ label {
+  display: block;  
+  box-sizing: border-box;
+  width: 100%;
+ }
+
+ label {
+    margin-bottom: .25em;
+ }
+
+ input {
+    padding: .75em;
+    border-radius: 5px;
+    margin-bottom: 1.5em;
+    border: 1px solid gray;
+ }
+
+ h1 {
+    margin: 0;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 35px;
+    color: white;
+    text-shadow: 2px 2px 4px black;
+ }
+
+ p {
+    margin-bottom: 1.5em;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 18px;
+    color: white;
+    text-shadow: 2px 2px 4px black;
+ }
+
+ .btn {
+    background-color: #E94B6A;
+    color: black;
+    border: none;
+    border-radius: .40em;
+    box-shadow: 1px 1px 3px black;
+    font-size: 16px;
+ }
+
+.btn:hover {
+    background-color: #E94B6A;
+    color: white;
+    border: none;
+    border-radius: .40em;
+    box-shadow: 1px 1px 5px black;
+    cursor: pointer;
+    font-size: 16px;
+}
+ 
+ .btn:active {
+    background-color: #E94B6A;
+    color: white;
+    border: none;
+    border-radius: .40em;
+    box-shadow: 1px 1px 5px black;
+    cursor: pointer;
+    font-size: 16px;
+    transform: translateY(2px);
+}
+
+div.rem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    align-items: flex-start;
+    margin-left: 10px;
+}
+
+#remember {
+    margin: 0;
+    top: -15px;
+    left: -10px;
+    width: auto;
+}
+
+label[for="remember"] {
+    font-size: 14px;
+    color: #333;
+    margin: 0;
+    top: -15px;
+    left: -10px;
+    width: auto;
+}
+
+#remember, label[for="remember"] {
+    position: relative;
+    cursor:pointer;
+}
+
+.forgot-password {
+    position: relative;
+    margin-left: auto;
+    font-size: 14px;
+    color: #E94B6A;
+    text-decoration: none;
+    top: -15px;
+    width: auto;
+}
+
+.forgot-password:hover {
+    color: #a20ee7;
+    text-decoration: underline;
+}
+
+.input-group {
+    margin-top: 1em;
+}
+
+.input-group, .input-group2 {
+    position: relative;
+    width: 100%;
+}
+
+.input-group input, .input-group2 input {
+    width: 100%;
+    padding-left: 40px; /* espaço pro ícone */
+    height: 40px;
+}
+
+.input-group .icon, .input-group2 .icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px; /* controla tamanho */
+    height: 18px;
+    pointer-events: none;
+}
+
+.register-text {
+    text-align: center;
+    font-size: 16px;
+    margin-top: 10px;
+    color: black;
+    text-shadow: none;
+}
+
+.register-text a {
+    color:#E94B6A;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.register-text a:hover {
+    text-decoration: underline;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+    width: 100%;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #ccc;
+}
+
+.divider span {
+    margin: 0 10px;
+    font-size: 12px;
+    color: #777;
+}
