@@ -199,3 +199,10 @@ label[for="remember"] {
     font-size: 12px;
     color: #777;
 }
+
+label[for="nome"] {
+    margin-bottom: .25em;
+    font-size: 22px;
+    color: #333;
+    text-align: center;
+}
