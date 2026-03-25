@@ -1,44 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
-    <title>login</title>
+    <title>Login | Agenda da Manicure</title>
 </head>
 <body>
-    <h1>Bem vinda!</h1>
-    <p>Acesse sua conta para agendar seus horários.</p>
+    <main class="auth-page">
+        <section class="hero-copy">
+            <h1>Bem-vinda!</h1>
+            <p>Acesse sua conta para agendar seus horarios com rapidez.</p>
+        </section>
 
-    <form action="#" method="post">
-        <fieldset>
-           <div class="input-group">
-                <img src="img/perfil.png" class="icon">
-                <input type="text" placeholder="Usuário" required name="username">
-            </div>
-            <div class="input-group2">
-                <img src="img/cadeado.png" class="icon">
-                <input type="password" placeholder="Senha" required name="password">
-            </div>
-            <div class="rem">
-                <input type="checkbox" id="remember">
-                <label for="remember">Lembrar-me</label>
-                <a href="senha.html" class="forgot-password">Esqueceu sua senha?</a>
-            </div>
+        <form class="card auth-form" id="login-form" action="#" method="post">
+            <fieldset>
+                <legend>Entrar na conta</legend>
 
-            <div class="action">
-                <input type="submit" value="Entrar" class="btn">
-            </div>
-            <div class="divider">
-                <span></span>
-            </div>
-            <div>
+                <div class="input-group">
+                    <img src="img/perfil.png" class="icon" alt="">
+                    <input id="username" type="text" placeholder="Digite seu usuario" required name="username" autocomplete="username">
+                </div>
+
+                <div class="input-group">
+                    <img src="img/cadeado.png" class="icon" alt="">
+                    <input id="password" type="password" placeholder="Digite sua senha" required name="password" autocomplete="current-password">
+                </div>
+
+                <div class="rem">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Lembrar-me</label>
+                    </div>
+                    <a href="senha.html" class="forgot-password">Esqueceu sua senha?</a>
+                </div>
+
+                <div class="action">
+                    <button type="submit" class="btn">Entrar</button>
+                </div>
+
+                <div class="divider" aria-hidden="true">
+                    <span></span>
+                </div>
+
                 <p class="register-text">
-                        Não tem uma conta? <a href="cadastro.html">Cadastre-se</a>
+                    Nao tem uma conta? <a href="cadastro.html">Cadastre-se</a>
                 </p>
-            </div>
-        </fieldset>
-    </form>
-    
+            </fieldset>
+        </form>
+    </main>
+
+    <script src="js/script.js"></script>
 </body>
 </html>

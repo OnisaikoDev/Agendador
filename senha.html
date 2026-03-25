@@ -1,33 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
-    <title>login</title>
+    <title>Recuperar Senha | Agenda da Manicure</title>
 </head>
 <body>
-    <h1>Recuperar Senha</h1>
-    <p>Informe seu email para recuperar sua senha.</p>
+    <main class="auth-page">
+        <section class="hero-copy">
+            <h1>Recuperar senha</h1>
+            <p>Informe seu email para receber as instrucoes de acesso.</p>
+        </section>
 
-    <form action="#" method="post">
-        <fieldset>
-           <div id="cadastro">
-                <input type="email" placeholder="Email" required name="email">
-            </div>
-            <div class="action">
-                <input type="submit" value="Recuperar Senha" class="btn">
-            </div>
-                <div class="divider">
-                <span></span>
-            </div>
-            <div>
+        <form class="card auth-form" id="recovery-form" action="#" method="post">
+            <fieldset>
+                <legend>Recuperacao de senha</legend>
+
+                <div id="cadastro">
+                    <input id="recovery-email" type="email" placeholder="voce@email.com" required name="email" autocomplete="email">
+                </div>
+
+                <div class="action">
+                    <button type="submit" class="btn">Recuperar senha</button>
+                </div>
+
+                <div class="divider" aria-hidden="true">
+                    <span></span>
+                </div>
+
                 <p class="register-text">
-                        Já tem uma conta? <a href="index.html">Faça login</a>
+                    Ja tem uma conta? <a href="index.html">Faca login</a>
                 </p>
-            </div>
-        </fieldset>
-    </form>
-    
+            </fieldset>
+        </form>
+    </main>
+
+    <script src="js/script.js"></script>
 </body>
 </html>

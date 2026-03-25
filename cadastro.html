@@ -1,37 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
-    <title>login</title>
+    <title>Cadastro | Agenda da Manicure</title>
 </head>
 <body>
-    <h1>Bem vinda!</h1>
-    <p>Crie sua conta para agendar seus horários.</p>
+    <main class="auth-page">
+        <section class="hero-copy">
+            <h1>Crie sua conta</h1>
+            <p>Cadastre-se para agendar horarios e acompanhar seus atendimentos.</p>
+        </section>
 
-    <form action="#" method="post">
-        <fieldset>
-           <div id="cadastro">
-            <input type="text" placeholder="Nome" required name="name">
-            <input type="text" placeholder="Sobrenome" required name="lastname">
-            <input type="email" placeholder="Email" required name="email">
-            <input type="number" placeholder="Telefone" required name="phone">
-            <input type="text" placeholder="Usuário" required name="username">
-            <input type="password" placeholder="Senha" required name="password">
-            <input type="password" placeholder="Confirmar senha" required name="confirm_password">
-            <input type="submit" value="Cadastrar" class="btn">
-           </div>
-           <div>
-             <div class="divider">
-                <span></span>
-            </div>
-            <p class="register-text">
-                    Já tem uma conta? <a href="index.html">Faça login</a>
-            </p>
-           </div>
-        </fieldset>
-    </form>
-    
+        <form class="card auth-form" id="register-form" action="#" method="post">
+            <fieldset>
+                <legend>Criar conta</legend>
+
+                <div id="cadastro">
+                    <input id="name" type="text" placeholder="Seu nome" required name="name" autocomplete="given-name">
+
+                    <input id="lastname" type="text" placeholder="Seu sobrenome" required name="lastname" autocomplete="family-name">
+
+                    <input id="email" type="email" placeholder="voce@email.com" required name="email" autocomplete="email">
+
+                    <input id="phone" type="tel" placeholder="(00) 00000-0000" required name="phone" autocomplete="tel">
+
+                    <input id="new-username" type="text" placeholder="Escolha um usuario" required name="username" autocomplete="username">
+
+                    <input id="new-password" type="password" placeholder="Crie uma senha" required name="password" autocomplete="new-password" minlength="6">
+
+                    <input id="confirm-password" type="password" placeholder="Repita a senha" required name="confirm_password" autocomplete="new-password" minlength="6">
+
+                    <button type="submit" class="btn">Cadastrar</button>
+                </div>
+
+                <div class="divider" aria-hidden="true">
+                    <span></span>
+                </div>
+
+                <p class="register-text">
+                    Ja tem uma conta? <a href="index.html">Faca login</a>
+                </p>
+            </fieldset>
+        </form>
+    </main>
+
+    <script src="js/script.js"></script>
 </body>
 </html>
