@@ -131,8 +131,14 @@ function ensureBaseData() {
             }
         });
     setJSON(STORAGE_KEYS.professionals, professionals);
-    const services = getJSON(STORAGE_KEYS.services, defaultServices).map((service) =>
-        typeof service === "string" ? { name: service, duration: 60 } : { ...service, duration: Number(service.duration) || 60 }
+    const services = getJSON(STORAGE_KEYS.services, []).map((service) =>
+        typeof service === "string"
+            ? { name: service, duration: 60, owner: "legacy-default" }
+            : {
+                ...service,
+                duration: Number(service.duration) || 60,
+                owner: service.owner || "legacy-default"
+            }
     );
     setJSON(STORAGE_KEYS.services, services);
     getJSON(STORAGE_KEYS.bills, []);
@@ -148,7 +154,7 @@ function getStoredClients() { return getJSON(STORAGE_KEYS.clients, []); }
 function saveClients(clients) { setJSON(STORAGE_KEYS.clients, clients); }
 function getStoredProfessionals() { return getJSON(STORAGE_KEYS.professionals, []); }
 function saveProfessionals(professionals) { setJSON(STORAGE_KEYS.professionals, professionals); }
-function getStoredServices() { return getJSON(STORAGE_KEYS.services, defaultServices); }
+function getStoredServices() { return getJSON(STORAGE_KEYS.services, []); }
 function saveServices(services) { setJSON(STORAGE_KEYS.services, services); }
 function getStoredBills() { return getJSON(STORAGE_KEYS.bills, []); }
 function saveBills(bills) { setJSON(STORAGE_KEYS.bills, bills); }
@@ -184,7 +190,7 @@ function saveUserProfessionals(username, userProfessionals) {
 
 function getUserServices(username) {
     return getStoredServices()
-        .filter((service) => !service.owner || service.owner === username)
+        .filter((service) => service.owner === username)
         .map((service) => ({ ...service, duration: Number(service.duration) || 60 }));
 }
 
@@ -705,7 +711,7 @@ function initDashboard() {
         const services = getUserServices(currentUser.username);
         const serviceNames = services.map((service) => service.name);
         if (serviceInput && !serviceNames.includes(serviceInput.value)) {
-            serviceInput.value = serviceNames[0] || "Manicure";
+            serviceInput.value = serviceNames[0] || "";
         }
     }
 
@@ -1422,12 +1428,14 @@ function initPublicBookingPage() {
 
     function renderServices() {
         const services = getUserServices(targetUser.username);
-        servicesWrap.innerHTML = services.map((service) => `
-            <button type="button" class="wizard-service-card ${state.service === service.name ? "selected" : ""}" data-select-service="${service.name}">
-                <span class="wizard-service-name">${service.name}</span>
-                <span class="wizard-service-duration">${service.duration} min</span>
-            </button>
-        `).join("");
+        servicesWrap.innerHTML = services.length
+            ? services.map((service) => `
+                <button type="button" class="wizard-service-card ${state.service === service.name ? "selected" : ""}" data-select-service="${service.name}">
+                    <span class="wizard-service-name">${service.name}</span>
+                    <span class="wizard-service-duration">${service.duration} min</span>
+                </button>
+            `).join("")
+            : '<div class="empty-state">Essa empresa ainda nao cadastrou servicos.</div>';
         nextServiceButton.disabled = !state.service;
     }
 
