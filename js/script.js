@@ -85,6 +85,13 @@ const defaultEvents = [
     }
 ];
 
+function createDefaultProfessionalsForUser(username) {
+    return defaultProfessionals.map((professional) => ({
+        ...professional,
+        owner: username
+    }));
+}
+
 function getJSON(key, fallbackValue) {
     // funcao geral para buscar qualquer dado salvo no localStorage
     const rawValue = localStorage.getItem(key);
@@ -113,7 +120,17 @@ function ensureBaseData() {
     setJSON(STORAGE_KEYS.users, users);
     getJSON(STORAGE_KEYS.events, defaultEvents);
     getJSON(STORAGE_KEYS.clients, []);
-    getJSON(STORAGE_KEYS.professionals, defaultProfessionals);
+    const professionals = getJSON(STORAGE_KEYS.professionals, defaultProfessionals).map((professional) =>
+        professional.owner ? professional : { ...professional, owner: "legacy-default" }
+    );
+    users
+        .filter((user) => user.role !== "admin")
+        .forEach((user) => {
+            if (!professionals.some((professional) => professional.owner === user.username)) {
+                professionals.push(...createDefaultProfessionalsForUser(user.username));
+            }
+        });
+    setJSON(STORAGE_KEYS.professionals, professionals);
     const services = getJSON(STORAGE_KEYS.services, defaultServices).map((service) =>
         typeof service === "string" ? { name: service, duration: 60 } : { ...service, duration: Number(service.duration) || 60 }
     );
@@ -129,7 +146,7 @@ function getStoredEvents() { return getJSON(STORAGE_KEYS.events, defaultEvents);
 function saveEvents(events) { setJSON(STORAGE_KEYS.events, events); }
 function getStoredClients() { return getJSON(STORAGE_KEYS.clients, []); }
 function saveClients(clients) { setJSON(STORAGE_KEYS.clients, clients); }
-function getStoredProfessionals() { return getJSON(STORAGE_KEYS.professionals, defaultProfessionals); }
+function getStoredProfessionals() { return getJSON(STORAGE_KEYS.professionals, []); }
 function saveProfessionals(professionals) { setJSON(STORAGE_KEYS.professionals, professionals); }
 function getStoredServices() { return getJSON(STORAGE_KEYS.services, defaultServices); }
 function saveServices(services) { setJSON(STORAGE_KEYS.services, services); }
@@ -150,9 +167,7 @@ function saveUserEvents(username, userEvents) {
 }
 
 function getUserProfessionals(username) {
-    return getStoredProfessionals().filter((professional) =>
-        !professional.owner || professional.owner === username
-    );
+    return getStoredProfessionals().filter((professional) => professional.owner === username);
 }
 
 function getOwnedProfessionals(username) {
@@ -161,7 +176,10 @@ function getOwnedProfessionals(username) {
 
 function saveUserProfessionals(username, userProfessionals) {
     const otherProfessionals = getStoredProfessionals().filter((professional) => professional.owner !== username);
-    saveProfessionals([...otherProfessionals, ...userProfessionals]);
+    saveProfessionals([...otherProfessionals, ...userProfessionals.map((professional) => ({
+        ...professional,
+        owner: username
+    }))]);
 }
 
 function getUserServices(username) {
