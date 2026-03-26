@@ -1,6 +1,7 @@
 :root {
-    --primary: #e94b6a;
-    --primary-dark: #c53855;
+    /* aqui eu deixei as cores principais do sistema para facilitar quando eu quiser mudar depois */
+    --primary: #ef6f91;
+    --primary-dark: #da5d7e;
     --accent: #2e2e48;
     --surface: rgba(255, 255, 255, 0.94);
     --surface-strong: #ffffff;
@@ -8,6 +9,8 @@
     --muted: #6b5a65;
     --border: #dfd4d9;
     --shadow: 0 18px 45px rgba(79, 32, 49, 0.18);
+    --soft-pink: #fff7fa;
+    --soft-pink-strong: #fff0f5;
 }
 
 html {
@@ -16,9 +19,10 @@ html {
 }
 
 body {
+    /* fundo geral do projeto */
     margin: 0;
     min-height: 100vh;
-    background-image: linear-gradient(rgba(69, 31, 44, 0.48), rgba(69, 31, 44, 0.48)), url("../img/ChatGPT Image 23 de mar. de 2026, 11_54_16.png");
+    background-image: linear-gradient(rgba(69, 31, 44, 0.42), rgba(69, 31, 44, 0.42)), url("../img/ChatGPT Image 23 de mar. de 2026, 11_54_16.png");
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
@@ -30,6 +34,7 @@ body {
 }
 
 .auth-page {
+    /* organizacao das telas de login, cadastro e recuperacao */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -40,6 +45,30 @@ body {
 .hero-copy {
     max-width: 420px;
     color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.hero-logo {
+    width: min(100%, 220px);
+    max-height: 170px;
+    display: block;
+    margin: 0 0 10px;
+    object-fit: contain;
+    transform: perspective(220px) rotateX(10deg) translateY(-2px);
+    filter: brightness(1.08) contrast(1.18) saturate(1.06) drop-shadow(0 2px 0 rgba(255, 244, 247, 0.95)) drop-shadow(0 10px 16px rgba(103, 54, 69, 0.2)) drop-shadow(0 18px 24px rgba(103, 54, 69, 0.14));
+}
+
+.hero-copy h1 {
+    margin-bottom: 8px;
+}
+
+.hero-copy p {
+    max-width: 360px;
+    margin-bottom: 0;
 }
 
 h1,
@@ -70,11 +99,17 @@ p {
 }
 
 .card {
+    /* caixinha branca usada nas telas de autenticacao */
     width: min(100%, 430px);
     background: var(--surface);
     border-radius: 20px;
     box-shadow: var(--shadow);
     backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.58);
+}
+
+.auth-form .btn {
+    border-radius: 12px;
 }
 
 .auth-form {
@@ -103,7 +138,8 @@ label {
 
 input,
 button,
-select {
+select,
+textarea {
     width: 100%;
     box-sizing: border-box;
     padding: 0.85rem 0.95rem;
@@ -113,17 +149,27 @@ select {
     font-size: 1rem;
     color: var(--text);
     background: var(--surface-strong);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #967c87;
 }
 
 input:focus,
 button:focus,
 select:focus,
+textarea:focus,
 a:focus {
     outline: 2px solid rgba(233, 75, 106, 0.35);
     outline-offset: 2px;
+    border-color: rgba(239, 111, 145, 0.55);
+    box-shadow: 0 0 0 5px rgba(239, 111, 145, 0.1);
 }
 
 .btn {
+    /* estilo padrao dos botoes principais */
     margin-bottom: 0;
     background-color: var(--primary);
     color: #fff;
@@ -136,6 +182,7 @@ a:focus {
 
 .btn:hover {
     background-color: var(--primary-dark);
+    box-shadow: 0 14px 28px rgba(233, 75, 106, 0.3);
 }
 
 .btn:active {
@@ -203,6 +250,37 @@ a:focus {
     color: var(--text);
 }
 
+.plans-box {
+    margin: 8px 0 16px;
+    padding: 16px;
+    border: 1px solid #f0d7df;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #fff9fb, #fff4f8);
+}
+
+.plans-title {
+    margin: 0 0 10px;
+    color: var(--text);
+    font-weight: 700;
+}
+
+.plan-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.plan-option input {
+    width: auto;
+    margin: 0;
+}
+
+.plan-option span {
+    font-size: 0.95rem;
+}
+
 .divider {
     display: flex;
     align-items: center;
@@ -229,7 +307,8 @@ a:focus {
 }
 
 .dashboard-page {
-    background-image: linear-gradient(rgba(241, 171, 189, 0.16), rgba(246, 219, 228, 0.22)), url("../img/ChatGPT Image 23 de mar. de 2026, 11_54_16.png");
+    /* fundo do dashboard e do admin */
+    background-image: linear-gradient(rgba(241, 171, 189, 0.12), rgba(246, 219, 228, 0.18)), url("../img/ChatGPT Image 23 de mar. de 2026, 11_54_16.png");
     background-position: center top;
     background-size: cover;
     color: var(--text);
@@ -242,15 +321,16 @@ a:focus {
 }
 
 .dashboard-header {
+    /* topo rosa principal */
     width: 100%;
-    background: linear-gradient(180deg, #eb4d71, #e94669);
-    border-radius: 14px;
+    background: linear-gradient(180deg, #f47f9d, #ec7292);
+    border-radius: 18px;
     display: grid;
     grid-template-columns: 120px 1fr 120px;
     align-items: center;
     padding: 13px 20px;
     box-sizing: border-box;
-    box-shadow: 0 8px 18px rgba(181, 62, 91, 0.18);
+    box-shadow: 0 12px 26px rgba(181, 62, 91, 0.16);
     column-gap: 12px;
 }
 
@@ -260,17 +340,22 @@ a:focus {
 }
 
 .header-logo {
-    width: 48px;
-    height: 48px;
+    width: 88px;
+    height: 62px;
     justify-self: start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .header-logo img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    border-radius: 4px;
-    background: white;
+    object-fit: contain;
+    border-radius: 0;
+    background: transparent;
+    transform: perspective(180px) rotateX(8deg) translateY(-1px);
+    filter: brightness(1.12) contrast(1.22) saturate(1.1) drop-shadow(0 2px 0 rgba(255, 244, 247, 0.95)) drop-shadow(0 8px 10px rgba(120, 60, 78, 0.22)) drop-shadow(0 14px 18px rgba(120, 60, 78, 0.18));
 }
 
 .header-menu {
@@ -281,6 +366,7 @@ a:focus {
 }
 
 .menu {
+    /* menu superior em linha */
     display: flex;
     list-style: none;
     gap: 18px;
@@ -296,9 +382,10 @@ a:focus {
     padding: 10px 15px;
     cursor: pointer;
     border-radius: 8px;
-    transition: color 0.2s ease, background-color 0.2s ease;
+    transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
     color: white;
     font-size: 0.95rem;
+    font-weight: 600;
     text-align: center;
 }
 
@@ -306,16 +393,17 @@ a:focus {
 .menu .active {
     color: white;
     background: #212b59;
+    transform: translateY(-1px);
 }
 
 .logout {
     width: auto;
     margin: 0;
     padding: 9px 18px;
-    background: #ff6e68;
+    background: linear-gradient(180deg, #ff847d, #ff736c);
     color: white;
     border: 1px solid rgba(115, 20, 36, 0.2);
-    box-shadow: 0 2px 8px rgba(115, 20, 36, 0.14);
+    box-shadow: 0 8px 16px rgba(115, 20, 36, 0.14);
     border-radius: 10px;
     font-size: 0.95rem;
     justify-self: end;
@@ -327,20 +415,31 @@ a:focus {
 }
 
 .dashboard-card {
+    /* bloco principal branco que segura o conteudo */
     display: block;
     background: rgba(255, 255, 255, 0.92);
-    border-radius: 18px;
-    padding: 20px;
-    box-shadow: 0 14px 28px rgba(191, 86, 111, 0.16);
+    border-radius: 22px;
+    padding: 22px;
+    box-shadow: 0 18px 36px rgba(191, 86, 111, 0.14);
     border: 1px solid rgba(255, 255, 255, 0.72);
 }
 
+.calendar-panel h2,
+.dashboard-card h2 {
+    margin: 0 0 16px;
+    font-size: 1.15rem;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 700;
+    color: #503844;
+}
+
 .calendar-panel {
+    /* painel do calendario */
     background: rgba(255, 255, 255, 0.96);
-    border-radius: 10px;
-    padding: 20px 18px;
+    border-radius: 16px;
+    padding: 22px 20px;
     border: 1px solid #e6e6e6;
-    box-shadow: 0 0 14px rgba(247, 99, 142, 0.38);
+    box-shadow: 0 12px 28px rgba(247, 99, 142, 0.16);
 }
 
 #agendamento {
@@ -357,7 +456,10 @@ a:focus {
 
 #agendamento input,
 #agendamento select,
-#client-form input {
+#client-form input,
+.settings-form input,
+.settings-form select,
+.settings-form textarea {
     border-radius: 5px;
     border: 1px solid #d2d2d2;
     background: #fff;
@@ -366,6 +468,12 @@ a:focus {
     height: 38px;
     color: #555;
     padding: 0.7rem 0.8rem;
+}
+
+.settings-form textarea {
+    min-height: 110px;
+    resize: vertical;
+    height: auto;
 }
 
 #agendamento .btn {
@@ -393,6 +501,17 @@ a:focus {
     align-items: center;
     gap: 10px;
     margin-bottom: 14px;
+}
+
+.calendar-clock {
+    margin-left: auto;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: #fff4f7;
+    border: 1px solid #f0d7df;
+    color: #9d4d65;
+    font-weight: 700;
+    font-size: 0.9rem;
 }
 
 .calendar-nav {
@@ -426,7 +545,7 @@ a:focus {
 .calendar-section {
     background: #fff;
     border: 1px solid #dfdfdf;
-    border-radius: 2px;
+    border-radius: 10px;
     padding: 0;
     overflow: hidden;
 }
@@ -518,6 +637,7 @@ a:focus {
 }
 
 .booking-drawer {
+    /* drawer lateral usado no dashboard e admin */
     position: fixed;
     top: 0;
     right: 0;
@@ -538,11 +658,12 @@ a:focus {
 
 .booking-drawer-card {
     height: 100%;
-    background: #fff;
-    border-radius: 18px 0 0 18px;
-    padding: 22px 18px;
-    box-shadow: -12px 0 30px rgba(96, 45, 60, 0.2);
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 24px 0 0 24px;
+    padding: 24px 20px;
+    box-shadow: -18px 0 38px rgba(96, 45, 60, 0.16);
     border-left: 1px solid #f0d6dd;
+    backdrop-filter: blur(8px);
 }
 
 .drawer-header {
@@ -550,7 +671,7 @@ a:focus {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
 }
 
 .drawer-header h2 {
@@ -585,6 +706,7 @@ a:focus {
 }
 
 .settings-menu {
+    /* botoes das abas dentro das configuracoes */
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
@@ -594,9 +716,9 @@ a:focus {
 .settings-tab {
     margin: 0;
     padding: 10px 12px;
-    border-radius: 10px;
+    border-radius: 12px;
     border: 1px solid #ead0d8;
-    background: #fff5f8;
+    background: var(--soft-pink);
     color: #9d4d65;
     font-size: 0.9rem;
     box-shadow: none;
@@ -633,6 +755,36 @@ a:focus {
     margin: 0;
 }
 
+.plan-shop {
+    display: grid;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.plan-card {
+    padding: 16px;
+    border-radius: 16px;
+    border: 1px solid #f0d7df;
+    background: linear-gradient(180deg, #fffdfd, #fff6fa);
+    box-shadow: 0 12px 24px rgba(214, 130, 157, 0.08);
+}
+
+.plan-card strong,
+.plan-card span {
+    display: block;
+}
+
+.plan-card p {
+    margin: 8px 0 12px;
+    color: #6e5e68;
+}
+
+.plan-buy-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .settings-list {
     display: flex;
     flex-direction: column;
@@ -640,14 +792,16 @@ a:focus {
 }
 
 .settings-item {
+    /* cardzinho padrao para listas do sistema */
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 12px;
-    padding: 12px;
-    border-radius: 10px;
-    background: #fff7fa;
+    padding: 14px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #fffdfd, #fff6fa);
     border: 1px solid #f0d7df;
+    box-shadow: 0 10px 22px rgba(214, 130, 157, 0.07);
 }
 
 .settings-item strong,
@@ -667,8 +821,19 @@ a:focus {
     padding: 8px 10px;
     border-radius: 8px;
     border: none;
-    background: #ff7b88;
+    background: linear-gradient(180deg, #ff8d98, #ff7886);
     color: white;
+    box-shadow: none;
+}
+
+.secondary-btn {
+    width: auto;
+    margin: 0;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #e4c6d0;
+    background: linear-gradient(180deg, #ffffff, #fff7fa);
+    color: #9d4d65;
     box-shadow: none;
 }
 
@@ -681,14 +846,252 @@ a:focus {
     font-weight: 700;
 }
 
+.status-pill.paid {
+    background: #dff6e4;
+    color: #1d7a37;
+}
+
 .empty-state {
     margin: 0;
     padding: 14px;
-    border-radius: 10px;
-    background: #fff7fa;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #fffdfd, #fff7fa);
     border: 1px dashed #efc8d5;
     color: #7f6973;
     text-align: center;
+}
+
+.admin-shell {
+    width: min(1100px, 100%);
+}
+
+.admin-main-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 18px;
+}
+
+.admin-full {
+    grid-column: 1 / -1;
+}
+
+.admin-user-form {
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #f0d7df;
+}
+
+.admin-user-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.inline-input {
+    width: 180px;
+    margin: 0;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #e4c6d0;
+    font-size: 0.85rem;
+}
+
+.inline-file {
+    width: 180px;
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+.bill-group {
+    padding: 14px;
+    border-radius: 12px;
+    background: #fffafb;
+    border: 1px solid #f0d7df;
+}
+
+.bill-group h3 {
+    margin: 0 0 10px;
+    font-size: 1rem;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#admin-bill-search {
+    margin-bottom: 16px;
+}
+
+#admin-bill-search,
+.admin-user-form input[type="file"] {
+    background: #fffafb;
+}
+
+.bill-accordion {
+    border-radius: 16px;
+    border: 1px solid #f0d7df;
+    background: linear-gradient(180deg, #fffdfd, #fff6fa);
+    overflow: hidden;
+    box-shadow: 0 12px 24px rgba(214, 130, 157, 0.08);
+}
+
+.bill-accordion summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transition: background-color 0.2s ease;
+}
+
+.bill-accordion summary:hover {
+    background: rgba(255, 245, 248, 0.72);
+}
+
+.bill-accordion summary::-webkit-details-marker {
+    display: none;
+}
+
+.bill-accordion-head strong,
+.bill-accordion-head span {
+    display: block;
+}
+
+.bill-accordion-head span {
+    margin-top: 4px;
+    color: #7f6973;
+    font-size: 0.82rem;
+}
+
+.bill-accordion-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff1f5;
+    color: #be4d68;
+    font-size: 1.1rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.bill-accordion[open] .bill-accordion-icon {
+    background: var(--primary);
+    color: white;
+}
+
+.bill-accordion-body {
+    padding: 0 16px 16px;
+    border-top: 1px solid #f4dbe3;
+}
+
+.bill-user-meta {
+    display: grid;
+    gap: 10px;
+    margin: 14px 0;
+}
+
+.bill-user-meta .settings-item {
+    align-items: flex-start;
+}
+
+.support-card {
+    /* card dos chamados de ajuda */
+    padding: 16px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #fffdfd, #fff6fa);
+    border: 1px solid #f0d7df;
+    box-shadow: 0 12px 24px rgba(214, 130, 157, 0.08);
+}
+
+.support-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.support-text {
+    margin: 0 0 12px;
+    color: #5f4f57;
+}
+
+.support-response {
+    margin-bottom: 10px;
+}
+
+.external-link-box {
+    padding: 16px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #fffdfd, #fff6fa);
+    border: 1px solid #f0d7df;
+    box-shadow: 0 12px 24px rgba(214, 130, 157, 0.08);
+}
+
+.external-link-box p {
+    margin: 0 0 14px;
+    color: #705c66;
+}
+
+.external-link-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.external-link-row input {
+    margin: 0;
+    background: #fff;
+}
+
+.public-booking-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 16px;
+    box-sizing: border-box;
+}
+
+.public-booking-shell {
+    width: min(100%, 560px);
+}
+
+.public-booking-card {
+    background: rgba(255, 255, 255, 0.94);
+    border-radius: 28px;
+    padding: 28px 24px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 20px 42px rgba(112, 54, 71, 0.16);
+    backdrop-filter: blur(8px);
+}
+
+.public-booking-logo {
+    width: min(100%, 180px);
+    max-height: 140px;
+    display: block;
+    margin: 0 auto 12px;
+    object-fit: contain;
+    transform: perspective(220px) rotateX(8deg) translateY(-1px);
+    filter: brightness(1.08) contrast(1.16) saturate(1.05) drop-shadow(0 10px 16px rgba(103, 54, 69, 0.15));
+}
+
+.public-booking-card h1,
+.public-booking-card p {
+    text-align: center;
+}
+
+.public-booking-card h1 {
+    margin-bottom: 8px;
+    color: #493540;
+}
+
+.public-booking-card p {
+    color: #7b6670;
+    margin-bottom: 18px;
 }
 
 @media (max-width: 980px) {
@@ -714,6 +1117,22 @@ a:focus {
     .menu li {
         padding: 8px 10px;
         font-size: 0.85rem;
+    }
+
+    .admin-main-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-user-actions {
+        width: 100%;
+    }
+
+    .inline-input {
+        width: 100%;
+    }
+
+    .inline-file {
+        width: 100%;
     }
 }
 
