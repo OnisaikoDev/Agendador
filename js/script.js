@@ -633,7 +633,22 @@ function initDashboard() {
         headerToolbar: false,
         resources: getUserProfessionals(currentUser.username),
         events: getUserEvents(currentUser.username),
-        datesSet: () => updateCalendarTitle()
+        datesSet: () => updateCalendarTitle(),
+        eventClick: (info) => {
+            const startLabel = new Date(info.event.startStr).toLocaleString("pt-BR", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+            const shouldRemove = window.confirm(`Deseja cancelar o agendamento "${info.event.title}" de ${startLabel}?`);
+            if (!shouldRemove) { return; }
+            removeStoredEvent(info.event);
+            info.event.remove();
+            renderScheduledList();
+            alert("Agendamento cancelado com sucesso.");
+        }
     });
 
     function updateCalendarTitle() {
@@ -911,6 +926,18 @@ function initDashboard() {
 
     function refreshCalendarResources() {
         calendar.setOption("resources", getUserProfessionals(currentUser.username));
+    }
+
+    function removeStoredEvent(calendarEvent) {
+        const updatedEvents = getUserEvents(currentUser.username).filter((event) =>
+            !(
+                event.title === calendarEvent.title &&
+                event.start === calendarEvent.startStr &&
+                event.end === calendarEvent.endStr &&
+                String(event.resourceId) === String(calendarEvent.getResources()[0]?.id || calendarEvent.extendedProps?.resourceId || "")
+            )
+        );
+        saveUserEvents(currentUser.username, updatedEvents);
     }
 
     function syncCurrentUserData() {
