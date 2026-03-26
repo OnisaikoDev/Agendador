@@ -5,28 +5,102 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" type="image/png" href="img/ico.png">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <title>Agendamento | Auralynne</title>
 </head>
-<body class="public-booking-page">
-    <main class="public-booking-shell">
-        <section class="public-booking-card">
-            <img id="public-booking-logo" src="img/ico.png" alt="Logo Auralynne" class="public-booking-logo">
+<body class="public-booking-page wizard-theme">
+    <main class="booking-wizard-shell">
+        <header class="wizard-header">
+            <img id="public-booking-logo" src="img/ico.png" alt="Logo Auralynne" class="wizard-logo">
             <h1 id="public-booking-title">Agende seu horario</h1>
-            <p id="public-booking-subtitle">Escolha o servico, a profissional e veja apenas os horarios disponiveis.</p>
+            <p id="public-booking-subtitle">Escolha o servico, a profissional e veja so os horarios disponiveis.</p>
+        </header>
 
+        <div class="wizard-steps" id="wizard-steps">
+            <div class="wizard-step active" data-step-dot="1">
+                <div class="wizard-step-circle">1</div>
+                <span>Servico</span>
+            </div>
+            <div class="wizard-step-line" data-step-line="1"></div>
+            <div class="wizard-step" data-step-dot="2">
+                <div class="wizard-step-circle">2</div>
+                <span>Profissional</span>
+            </div>
+            <div class="wizard-step-line" data-step-line="2"></div>
+            <div class="wizard-step" data-step-dot="3">
+                <div class="wizard-step-circle">3</div>
+                <span>Dados</span>
+            </div>
+            <div class="wizard-step-line" data-step-line="3"></div>
+            <div class="wizard-step" data-step-dot="4">
+                <div class="wizard-step-circle">4</div>
+                <span>Confirmar</span>
+            </div>
+        </div>
+
+        <section class="wizard-card" id="wizard-card">
             <div id="public-booking-status" class="empty-state" hidden></div>
 
-            <form id="public-booking-form" class="settings-form">
-                <input type="text" name="name" placeholder="Seu nome" required>
-                <input type="tel" name="phone" placeholder="Seu telefone" required>
-                <select id="public-service" name="service" required></select>
-                <select id="public-professional" name="professional" required></select>
-                <input type="date" id="public-date" name="date" required>
-                <select id="public-time" name="time" required>
-                    <option value="">Selecione um horario disponivel</option>
-                </select>
-                <button type="submit" class="btn">Confirmar agendamento</button>
-            </form>
+            <section class="wizard-panel" data-step-panel="1">
+                <h2>Qual servico?</h2>
+                <p>Selecione o atendimento desejado para continuar.</p>
+                <div id="wizard-services" class="wizard-service-grid"></div>
+                <div class="wizard-actions single">
+                    <button type="button" class="wizard-btn wizard-btn-primary" id="wizard-next-service" disabled>Proximo</button>
+                </div>
+            </section>
+
+            <section class="wizard-panel" data-step-panel="2" hidden>
+                <h2>Com quem?</h2>
+                <p>Escolha a profissional que voce prefere ou deixe sem preferencia.</p>
+                <div id="wizard-professionals" class="wizard-pro-list"></div>
+                <div class="wizard-actions">
+                    <button type="button" class="wizard-btn wizard-btn-secondary" id="wizard-back-service">Voltar</button>
+                    <button type="button" class="wizard-btn wizard-btn-primary" id="wizard-next-professional" disabled>Proximo</button>
+                </div>
+            </section>
+
+            <section class="wizard-panel" data-step-panel="3" hidden>
+                <h2>Quando e quem?</h2>
+                <p>Preencha seus dados e escolha um horario disponivel.</p>
+                <div class="wizard-form-group">
+                    <label>Seu nome</label>
+                    <input type="text" id="wizard-client-name" placeholder="Nome completo">
+                </div>
+                <div class="wizard-form-group">
+                    <label>Telefone</label>
+                    <input type="tel" id="wizard-client-phone" placeholder="(00) 00000-0000">
+                </div>
+                <div class="wizard-form-group">
+                    <label>Data</label>
+                    <input type="date" id="wizard-date">
+                </div>
+                <div class="wizard-form-group">
+                    <label>Horarios disponiveis</label>
+                    <div id="wizard-times" class="wizard-time-grid"></div>
+                </div>
+                <div class="wizard-actions">
+                    <button type="button" class="wizard-btn wizard-btn-secondary" id="wizard-back-professional">Voltar</button>
+                    <button type="button" class="wizard-btn wizard-btn-primary" id="wizard-next-summary" disabled>Revisar</button>
+                </div>
+            </section>
+
+            <section class="wizard-panel" data-step-panel="4" hidden>
+                <h2>Tudo certo?</h2>
+                <p>Confirme os dados antes de finalizar o agendamento.</p>
+                <div class="wizard-summary" id="wizard-summary"></div>
+                <div class="wizard-actions">
+                    <button type="button" class="wizard-btn wizard-btn-secondary" id="wizard-back-details">Voltar</button>
+                    <button type="button" class="wizard-btn wizard-btn-primary" id="wizard-confirm">Confirmar agendamento</button>
+                </div>
+            </section>
+
+            <section class="wizard-panel wizard-success" id="wizard-success" hidden>
+                <div class="wizard-success-icon">✓</div>
+                <h2>Agendamento confirmado</h2>
+                <p>Seu horario foi reservado com sucesso. Em breve voce pode receber uma confirmacao pelo contato informado.</p>
+                <button type="button" class="wizard-btn wizard-btn-primary" id="wizard-reset">Novo agendamento</button>
+            </section>
         </section>
     </main>
 
