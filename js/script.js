@@ -42,6 +42,7 @@ const defaultAdminUser = {
     phone: "(00) 00000-0000",
     username: "admin",
     password: "admin123",
+    companyName: "Auralynne",
     logo: DEFAULT_LOGO,
     planId: "line",
     planStatus: "active",
@@ -103,7 +104,8 @@ function ensureBaseData() {
     // aqui eu garanto que os dados iniciais sempre existam
     const users = getJSON(STORAGE_KEYS.users, [defaultAdminUser]).map((user) => ({
         ...user,
-        planDueDay: user.planDueDay || (user.planId && user.planId !== "none" ? "10" : "")
+        planDueDay: user.planDueDay || (user.planId && user.planId !== "none" ? "10" : ""),
+        companyName: user.companyName || user.name || user.username
     }));
     if (!users.some((user) => user.username === defaultAdminUser.username)) {
         users.push(defaultAdminUser);
@@ -490,6 +492,7 @@ function initRegisterForm() {
             phone: formData.get("phone")?.toString().trim(),
             username,
             password,
+            companyName: formData.get("name")?.toString().trim(),
             logo: DEFAULT_LOGO,
             planId,
             paymentMethod: paymentMethod || "",
@@ -588,6 +591,8 @@ function initDashboard() {
     const serviceList = document.getElementById("service-list");
     const financeList = document.getElementById("finance-list");
     const externalLinkPanel = document.getElementById("external-link-panel");
+    const companyForm = document.getElementById("company-form");
+    const companyNameInput = document.getElementById("company-name");
     const helpForm = document.getElementById("help-form");
     const helpList = document.getElementById("help-list");
     const userLogo = document.getElementById("user-logo");
@@ -744,8 +749,12 @@ function initDashboard() {
     function renderExternalLinkPanel() {
         if (!externalLinkPanel) { return; }
         const externalLink = getExternalBookingLink();
+        if (companyNameInput) {
+            companyNameInput.value = currentUser.companyName || "";
+        }
         externalLinkPanel.innerHTML = `
             <div class="external-link-box">
+                <p><strong>Empresa:</strong> ${currentUser.companyName || currentUser.name || currentUser.username}</p>
                 <p>Compartilhe esse link com seus clientes para que eles possam agendar sozinhos, sem login.</p>
                 <div class="external-link-row">
                     <input type="text" value="${externalLink}" readonly>
@@ -886,6 +895,62 @@ function initDashboard() {
         calendar.setOption("resources", getUserProfessionals(currentUser.username));
     }
 
+    function syncCurrentUserData() {
+        const latestUser = getCurrentUser();
+        if (!latestUser) {
+            window.location.href = "index.html";
+            return false;
+        }
+
+        Object.assign(currentUser, latestUser);
+        applyUserLogo();
+        renderFinance();
+        renderExternalLinkPanel();
+        renderHelpRequests();
+        applyPlanAccess();
+        return true;
+    }
+
+    function syncDashboardFromStorage(changedKey) {
+        if (!syncCurrentUserData()) { return; }
+
+        if (!changedKey || changedKey === STORAGE_KEYS.events) {
+            refreshCalendarEvents();
+            renderScheduledList();
+        }
+
+        if (!changedKey || changedKey === STORAGE_KEYS.professionals) {
+            renderEmployees();
+            renderProfessionalOptions();
+            refreshCalendarResources();
+        }
+
+        if (!changedKey || changedKey === STORAGE_KEYS.services) {
+            renderServices();
+            renderServiceOptions();
+            ensureSelectedService();
+        }
+
+        if (!changedKey || changedKey === STORAGE_KEYS.clients) {
+            renderClientSuggestions();
+            syncClientPhone();
+        }
+
+        if (!changedKey || changedKey === STORAGE_KEYS.help) {
+            renderHelpRequests();
+        }
+
+        if (!changedKey || changedKey === STORAGE_KEYS.bills) {
+            renderFinance();
+        }
+
+        if (!changedKey || changedKey === STORAGE_KEYS.users) {
+            renderFinance();
+            renderExternalLinkPanel();
+            applyPlanAccess();
+        }
+    }
+
     function closeAllDrawers() {
         [bookingDrawer, clientDrawer, settingsDrawer].forEach((drawer) => {
             if (drawer) {
@@ -949,6 +1014,16 @@ function initDashboard() {
     settingsTabs.forEach((tab) => tab.addEventListener("click", () => switchSettingsTab(tab.dataset.settingsTab)));
     prevButton?.addEventListener("click", () => { calendar.prev(); updateCalendarTitle(); });
     nextButton?.addEventListener("click", () => { calendar.next(); updateCalendarTitle(); });
+    window.addEventListener("storage", (event) => {
+        if (!event.key || Object.values(STORAGE_KEYS).includes(event.key)) {
+            syncDashboardFromStorage(event.key || "");
+        }
+    });
+    document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) {
+            syncDashboardFromStorage();
+        }
+    });
 
     form?.addEventListener("submit", (event) => {
         // cria um agendamento novo
@@ -1187,24 +1262,59 @@ function initDashboard() {
         applyPlanAccess();
         alert("Plano atualizado com sucesso.");
     });
+
+    companyForm?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const companyName = new FormData(companyForm).get("companyName")?.toString().trim();
+        if (!companyName) {
+            alert("Digite o nome da empresa.");
+            return;
+        }
+        updateUser({ username: currentUser.username, companyName });
+        currentUser.companyName = companyName;
+        renderExternalLinkPanel();
+        alert("Nome da empresa salvo com sucesso.");
+    });
 }
 
 function initPublicBookingPage() {
     // essa pagina publica serve para o cliente agendar sem precisar fazer login
-    const form = document.getElementById("public-booking-form");
-    if (!form) { return; }
+    const card = document.getElementById("wizard-card");
+    if (!card) { return; }
 
     const logo = document.getElementById("public-booking-logo");
     const title = document.getElementById("public-booking-title");
     const subtitle = document.getElementById("public-booking-subtitle");
     const statusBox = document.getElementById("public-booking-status");
-    const serviceSelect = document.getElementById("public-service");
-    const professionalSelect = document.getElementById("public-professional");
-    const dateInput = document.getElementById("public-date");
-    const timeSelect = document.getElementById("public-time");
+    const servicesWrap = document.getElementById("wizard-services");
+    const professionalsWrap = document.getElementById("wizard-professionals");
+    const timesWrap = document.getElementById("wizard-times");
+    const summaryWrap = document.getElementById("wizard-summary");
+    const nameInput = document.getElementById("wizard-client-name");
+    const phoneInput = document.getElementById("wizard-client-phone");
+    const dateInput = document.getElementById("wizard-date");
+    const nextServiceButton = document.getElementById("wizard-next-service");
+    const nextProfessionalButton = document.getElementById("wizard-next-professional");
+    const nextSummaryButton = document.getElementById("wizard-next-summary");
+    const confirmButton = document.getElementById("wizard-confirm");
+    const panels = document.querySelectorAll("[data-step-panel]");
+    const stepDots = document.querySelectorAll("[data-step-dot]");
+    const stepLines = document.querySelectorAll("[data-step-line]");
+    const successPanel = document.getElementById("wizard-success");
+    const resetButton = document.getElementById("wizard-reset");
     const params = new URLSearchParams(window.location.search);
     const username = params.get("user")?.trim();
     const targetUser = getStoredUsers().find((user) => user.username === username && user.role !== "admin");
+
+    const state = {
+        service: null,
+        professionalId: null,
+        professionalName: null,
+        date: "",
+        time: "",
+        name: "",
+        phone: ""
+    };
 
     function showPublicStatus(message) {
         if (!statusBox) { return; }
@@ -1212,11 +1322,21 @@ function initPublicBookingPage() {
         statusBox.textContent = message;
     }
 
+    function hidePublicStatus() {
+        if (!statusBox) { return; }
+        statusBox.hidden = true;
+        statusBox.textContent = "";
+    }
+
+    function getCurrentService() {
+        return getUserServices(targetUser.username).find((service) => service.name === state.service) || null;
+    }
+
     function getAvailableTimes(date, professionalId) {
         if (!date || !professionalId || !targetUser) { return []; }
         const userEvents = getUserEvents(targetUser.username);
-        const selectedService = getUserServices(targetUser.username).find((service) => service.name === serviceSelect?.value);
         const times = [];
+        const durationMinutes = getCurrentService()?.duration || 60;
 
         for (let hour = 8; hour < 20; hour += 1) {
             for (let minute = 0; minute < 60; minute += 30) {
@@ -1227,8 +1347,10 @@ function initPublicBookingPage() {
                 if (isPastTimeForToday(date, time)) {
                     continue;
                 }
-                const duration = addDuration(date, time, selectedService?.duration || 60);
-                if (!hasProfessionalConflict(userEvents, professionalId, duration.start, duration.end)) {
+                const duration = addDuration(date, time, durationMinutes);
+                const isAvailable = !hasProfessionalConflict(userEvents, professionalId, duration.start, duration.end);
+
+                if (isAvailable) {
                     times.push(time);
                 }
             }
@@ -1237,37 +1359,101 @@ function initPublicBookingPage() {
         return times;
     }
 
-    function renderServicesAndProfessionals() {
-        if (!targetUser || !serviceSelect || !professionalSelect) { return; }
-        const userServices = getUserServices(targetUser.username);
-        const userProfessionals = getUserProfessionals(targetUser.username);
+    function updateWizardStep(step) {
+        panels.forEach((panel) => {
+            panel.hidden = panel.dataset.stepPanel !== String(step);
+        });
+        if (successPanel) {
+            successPanel.hidden = true;
+        }
+        stepDots.forEach((dot, index) => {
+            dot.classList.toggle("active", index + 1 === step);
+            dot.classList.toggle("done", index + 1 < step);
+        });
+        stepLines.forEach((line, index) => {
+            line.classList.toggle("done", index + 1 < step);
+        });
+    }
 
-        serviceSelect.innerHTML = userServices.length
-            ? `<option value="">Servico</option>${userServices.map((service) => `<option value="${service.name}">${service.name}</option>`).join("")}`
-            : `<option value="">Nenhum servico disponivel</option>`;
+    function renderServices() {
+        const services = getUserServices(targetUser.username);
+        servicesWrap.innerHTML = services.map((service) => `
+            <button type="button" class="wizard-service-card ${state.service === service.name ? "selected" : ""}" data-select-service="${service.name}">
+                <span class="wizard-service-name">${service.name}</span>
+                <span class="wizard-service-duration">${service.duration} min</span>
+            </button>
+        `).join("");
+        nextServiceButton.disabled = !state.service;
+    }
 
-        professionalSelect.innerHTML = userProfessionals.length
-            ? `<option value="">Profissional</option>${userProfessionals.map((professional) => `<option value="${professional.id}">${professional.title}</option>`).join("")}`
-            : `<option value="">Nenhuma profissional disponivel</option>`;
+    function renderProfessionals() {
+        const professionals = getUserProfessionals(targetUser.username);
+        professionalsWrap.innerHTML = professionals.map((professional) => `
+            <button type="button" class="wizard-pro-card ${state.professionalId === professional.id ? "selected" : ""}" data-select-professional="${professional.id}" data-professional-name="${professional.title}">
+                <div class="wizard-pro-avatar">${professional.title.charAt(0)}</div>
+                <div class="wizard-pro-meta">
+                    <strong>${professional.title}</strong>
+                    <span>Atendimento disponivel para esse servico</span>
+                </div>
+            </button>
+        `).join("");
+        nextProfessionalButton.disabled = !state.professionalId;
     }
 
     function renderAvailableTimes() {
-        if (!timeSelect) { return; }
-        const date = dateInput?.value;
-        const professionalId = professionalSelect?.value;
-        if (!serviceSelect?.value) {
-            timeSelect.innerHTML = `<option value="">Escolha primeiro o servico</option>`;
+        if (!state.service || !state.professionalId || !state.date) {
+            timesWrap.innerHTML = '<div class="empty-state">Escolha servico, profissional e data para ver os horarios.</div>';
+            nextSummaryButton.disabled = true;
             return;
         }
-        const availableTimes = getAvailableTimes(date, professionalId);
 
-        timeSelect.innerHTML = availableTimes.length
-            ? `<option value="">Selecione um horario disponivel</option>${availableTimes.map((time) => `<option value="${time}">${time}</option>`).join("")}`
-            : `<option value="">Nenhum horario disponivel</option>`;
+        const availableTimes = getAvailableTimes(state.date, state.professionalId);
+        timesWrap.innerHTML = availableTimes.length
+            ? availableTimes.map((time) => `
+                <button type="button" class="wizard-time-slot ${state.time === time ? "selected" : ""}" data-select-time="${time}">${time}</button>
+            `).join("")
+            : '<div class="empty-state">Nenhum horario disponivel nessa data.</div>';
+        validateStepThree();
+    }
+
+    function validateStepThree() {
+        state.name = nameInput?.value.trim() || "";
+        state.phone = phoneInput?.value.trim() || "";
+        state.date = dateInput?.value || "";
+        const isValid = state.name.length > 2 && state.phone.length > 7 && state.date && state.time;
+        nextSummaryButton.disabled = !isValid;
+    }
+
+    function renderSummary() {
+        summaryWrap.innerHTML = `
+            <div class="wizard-summary-row"><span>Servico</span><span>${state.service || "—"}</span></div>
+            <div class="wizard-summary-row"><span>Profissional</span><span>${state.professionalName || "—"}</span></div>
+            <div class="wizard-summary-row"><span>Data</span><span>${state.date || "—"}</span></div>
+            <div class="wizard-summary-row"><span>Horario</span><span>${state.time || "—"}</span></div>
+            <div class="wizard-summary-row"><span>Cliente</span><span>${state.name || "—"}</span></div>
+            <div class="wizard-summary-row"><span>Telefone</span><span>${state.phone || "—"}</span></div>
+        `;
+    }
+
+    function resetWizard() {
+        state.service = null;
+        state.professionalId = null;
+        state.professionalName = null;
+        state.date = "";
+        state.time = "";
+        state.name = "";
+        state.phone = "";
+        if (nameInput) { nameInput.value = ""; }
+        if (phoneInput) { phoneInput.value = ""; }
+        if (dateInput) { dateInput.value = ""; }
+        hidePublicStatus();
+        renderServices();
+        renderProfessionals();
+        renderAvailableTimes();
+        updateWizardStep(1);
     }
 
     if (!targetUser) {
-        form.hidden = true;
         showPublicStatus("Nao encontramos um usuario valido para esse link de agendamento.");
         return;
     }
@@ -1276,61 +1462,123 @@ function initPublicBookingPage() {
         logo.src = normalizeLogoPath(targetUser.logo);
     }
     if (title) {
-        title.textContent = `Agende com ${targetUser.name || targetUser.username}`;
+        title.textContent = targetUser.companyName || targetUser.name || targetUser.username;
     }
     if (subtitle) {
-        subtitle.textContent = "Escolha o servico, a profissional e veja apenas os horarios livres da agenda.";
+        subtitle.textContent = "Selecione o servico, a profissional e finalize o agendamento em poucos passos.";
     }
 
-    renderServicesAndProfessionals();
     dateInput.min = formatDateOnly(new Date());
-    serviceSelect?.addEventListener("change", renderAvailableTimes);
-    professionalSelect?.addEventListener("change", renderAvailableTimes);
-    dateInput?.addEventListener("change", renderAvailableTimes);
+    renderServices();
+    renderProfessionals();
+    renderAvailableTimes();
+    updateWizardStep(1);
 
-    form.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const formData = new FormData(form);
-        const name = formData.get("name")?.toString().trim();
-        const phone = formData.get("phone")?.toString().trim();
-        const service = formData.get("service")?.toString().trim();
-        const professionalId = formData.get("professional")?.toString().trim();
-        const date = formData.get("date")?.toString().trim();
-        const time = formData.get("time")?.toString().trim();
+    servicesWrap?.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) { return; }
+        const button = target.closest("[data-select-service]");
+        if (!(button instanceof HTMLElement)) { return; }
+        state.service = button.dataset.selectService || null;
+        state.time = "";
+        renderServices();
+        renderAvailableTimes();
+    });
 
-        if (!name || !phone || !service || !professionalId || !date || !time) {
-            alert("Preencha todos os campos para concluir o agendamento.");
+    professionalsWrap?.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) { return; }
+        const button = target.closest("[data-select-professional]");
+        if (!(button instanceof HTMLElement)) { return; }
+        state.professionalId = button.dataset.selectProfessional || null;
+        state.professionalName = button.dataset.professionalName || null;
+        state.time = "";
+        renderProfessionals();
+        renderAvailableTimes();
+    });
+
+    timesWrap?.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) { return; }
+        const button = target.closest("[data-select-time]");
+        if (!(button instanceof HTMLElement)) { return; }
+        state.time = button.dataset.selectTime || "";
+        renderAvailableTimes();
+    });
+
+    nameInput?.addEventListener("input", validateStepThree);
+    phoneInput?.addEventListener("input", validateStepThree);
+    dateInput?.addEventListener("change", () => {
+        state.time = "";
+        validateStepThree();
+        renderAvailableTimes();
+    });
+
+    nextServiceButton?.addEventListener("click", () => updateWizardStep(2));
+    nextProfessionalButton?.addEventListener("click", () => updateWizardStep(3));
+    document.getElementById("wizard-back-service")?.addEventListener("click", () => updateWizardStep(1));
+    document.getElementById("wizard-back-professional")?.addEventListener("click", () => updateWizardStep(2));
+    document.getElementById("wizard-back-details")?.addEventListener("click", () => updateWizardStep(3));
+
+    nextSummaryButton?.addEventListener("click", () => {
+        renderSummary();
+        updateWizardStep(4);
+    });
+
+    confirmButton?.addEventListener("click", () => {
+        if (!state.service || !state.professionalId || !state.date || !state.time || !state.name || !state.phone) {
+            alert("Preencha tudo antes de confirmar.");
             return;
         }
 
-        if (isPastTimeForToday(date, time)) {
+        if (isPastTimeForToday(state.date, state.time)) {
             alert("Para hoje, escolha um horario futuro.");
+            updateWizardStep(3);
             renderAvailableTimes();
             return;
         }
-        const selectedService = getUserServices(targetUser.username).find((item) => item.name === service);
-        const duration = addDuration(date, time, selectedService?.duration || 60);
-        if (hasProfessionalConflict(getUserEvents(targetUser.username), professionalId, duration.start, duration.end)) {
-            alert("Esse horario acabou de ser ocupado. Escolha outro horario disponivel.");
+
+        const selectedService = getCurrentService();
+        const selectedProfessional = getUserProfessionals(targetUser.username).find((professional) => professional.id === state.professionalId);
+
+        if (!selectedProfessional) {
+            alert("Nao encontramos uma profissional livre nesse horario. Escolha outro horario.");
+            updateWizardStep(3);
+            renderAvailableTimes();
+            return;
+        }
+
+        const duration = addDuration(state.date, state.time, selectedService?.duration || 60);
+        if (hasProfessionalConflict(getUserEvents(targetUser.username), selectedProfessional.id, duration.start, duration.end)) {
+            alert("Esse horario acabou de ser ocupado. Escolha outro horario.");
+            updateWizardStep(3);
             renderAvailableTimes();
             return;
         }
 
         const newEvent = {
-            title: `${service} - ${name}`,
+            title: `${state.service} - ${state.name}`,
             start: duration.start,
             end: duration.end,
-            resourceId: professionalId,
-            backgroundColor: getEventColor(service),
-            extendedProps: { telefone: phone, owner: targetUser.username, externalBooking: true }
+            resourceId: selectedProfessional.id,
+            backgroundColor: getEventColor(state.service),
+            extendedProps: { telefone: state.phone, owner: targetUser.username, externalBooking: true }
         };
 
         saveUserEvents(targetUser.username, [...getUserEvents(targetUser.username), newEvent]);
-        form.reset();
-        renderAvailableTimes();
-        showPublicStatus("Agendamento confirmado com sucesso.");
-        alert("Agendamento confirmado com sucesso.");
+        hidePublicStatus();
+        panels.forEach((panel) => { panel.hidden = true; });
+        if (successPanel) {
+            successPanel.hidden = false;
+        }
+        stepDots.forEach((dot) => {
+            dot.classList.remove("active");
+            dot.classList.add("done");
+        });
+        stepLines.forEach((line) => line.classList.add("done"));
     });
+
+    resetButton?.addEventListener("click", resetWizard);
 }
 
 function initAdminDashboard() {
@@ -1538,6 +1786,7 @@ function initAdminDashboard() {
             phone: formData.get("phone")?.toString().trim(),
             username,
             password: formData.get("password")?.toString().trim(),
+            companyName: formData.get("name")?.toString().trim(),
             logo: logoData,
             planId: "none",
             planStatus: "inactive",
