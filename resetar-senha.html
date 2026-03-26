@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="img/ico.png">
+    <title>Nova Senha | Auralynne</title>
+</head>
+<body>
+    <main class="auth-page">
+        <!-- texto da tela onde a pessoa cria a senha nova -->
+        <section class="hero-copy">
+            <h1>Criar nova senha</h1>
+            <p>Use o codigo enviado no email simulado para redefinir sua senha.</p>
+        </section>
+
+        <!-- formulario para redefinir a senha -->
+        <form class="card auth-form" id="reset-password-form" action="#" method="post">
+            <fieldset>
+                <legend>Nova senha</legend>
+
+                <div id="cadastro">
+                    <!-- email, codigo recebido e senha nova -->
+                    <input type="email" name="email" id="reset-email" placeholder="Seu email" required>
+                    <input type="text" name="token" id="reset-token" placeholder="Codigo de recuperacao" required>
+                    <input type="password" name="password" placeholder="Nova senha" required minlength="6">
+                    <input type="password" name="confirm_password" placeholder="Repita a nova senha" required minlength="6">
+                    <button type="submit" class="btn">Salvar nova senha</button>
+                </div>
+
+                <div class="divider" aria-hidden="true">
+                    <span></span>
+                </div>
+
+                <p class="register-text">
+                    Voltar para <a href="index.html">login</a>
+                </p>
+            </fieldset>
+        </form>
+    </main>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

@@ -4,26 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="img/ico.png">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.js"></script>
-    <title>Dashboard | Agenda da Manicure</title>
+    <title>Dashboard | Auralynne</title>
 </head>
 <body class="dashboard-page">
     <div class="dashboard-shell">
+        <!-- cabecalho principal do dashboard -->
         <header class="dashboard-header">
             <div class="header-logo">
-                <img src="img/WhatsApp Image 2026-03-25 at 12.46.54.jpeg" alt="Logo">
+                <img id="user-logo" src="img/ico.png" alt="Logo Auralynne">
             </div>
 
+            <!-- menu principal da tela -->
             <nav class="header-menu" aria-label="Menu principal">
                 <ul class="menu">
-                    <li class="active">Dashboard</li>
                     <li id="open-booking-panel">Agendamento</li>
                     <li id="open-client-panel">Clientes</li>
                     <li id="open-settings-panel">Configuracoes</li>
                 </ul>
             </nav>
 
+            <!-- botao de sair da conta -->
             <button class="logout" type="button">Sair</button>
         </header>
 
@@ -37,6 +40,7 @@
                             <button type="button" class="calendar-arrow" id="calendar-next">&#8250;</button>
                         </div>
                         <h2 id="calendar-title">25 de marco de 2026</h2>
+                        <div class="calendar-clock" id="calendar-clock">00:00</div>
                     </div>
 
                     <div class="calendar-section">
@@ -48,6 +52,7 @@
         </main>
     </div>
 
+    <!-- drawer lateral para criar agendamento -->
     <aside class="booking-drawer" id="booking-drawer" aria-hidden="true">
         <div class="booking-drawer-card">
             <div class="drawer-header">
@@ -66,7 +71,7 @@
                     <option value="3">Joana</option>
                     <option value="4">Carla</option>
                 </select>
-                <input type="hidden" id="servico" name="servico" value="Manicure">
+                <select id="servico" name="servico" required></select>
                 <input type="date" id="data" name="data" required>
                 <input type="time" id="horario" name="horario" required>
                 <button type="submit" class="btn">Agendar</button>
@@ -74,6 +79,7 @@
         </div>
     </aside>
 
+    <!-- drawer lateral para cadastrar cliente -->
     <aside class="booking-drawer client-drawer" id="client-drawer" aria-hidden="true">
         <div class="booking-drawer-card">
             <div class="drawer-header">
@@ -92,6 +98,7 @@
         </div>
     </aside>
 
+    <!-- drawer lateral com configuracoes do sistema -->
     <aside class="booking-drawer settings-drawer" id="settings-drawer" aria-hidden="true">
         <div class="booking-drawer-card settings-card">
             <div class="drawer-header">
@@ -105,6 +112,8 @@
                 <button type="button" class="settings-tab" data-settings-tab="funcionarios">Funcionarios</button>
                 <button type="button" class="settings-tab" data-settings-tab="servicos">Servicos</button>
                 <button type="button" class="settings-tab" data-settings-tab="financeiro">Financeiro</button>
+                <button type="button" class="settings-tab" data-settings-tab="linkexterno">Link externo</button>
+                <button type="button" class="settings-tab" data-settings-tab="ajuda">Ajuda</button>
             </div>
 
             <!-- area para cancelar horarios ja criados -->
@@ -128,6 +137,13 @@
                 <h3>Gerenciar servicos</h3>
                 <form id="service-form" class="settings-form">
                     <input type="text" id="service-name" name="name" placeholder="Nome do servico" required>
+                    <select id="service-duration" name="duration" required>
+                        <option value="">Duracao do servico</option>
+                        <option value="30">30 minutos</option>
+                        <option value="60">1 hora</option>
+                        <option value="90">1 hora e 30</option>
+                        <option value="120">2 horas</option>
+                    </select>
                     <button type="submit" class="btn">Adicionar servico</button>
                 </form>
                 <div id="service-list" class="settings-list"></div>
@@ -137,6 +153,22 @@
             <section class="settings-panel" data-settings-panel="financeiro">
                 <h3>Boletos do sistema</h3>
                 <div id="finance-list" class="settings-list"></div>
+            </section>
+
+            <section class="settings-panel" data-settings-panel="linkexterno">
+                <h3>Link de agendamento externo</h3>
+                <div id="external-link-panel" class="settings-list"></div>
+            </section>
+
+            <section class="settings-panel" data-settings-panel="ajuda">
+                <h3>Fale com a gente</h3>
+                <form id="help-form" class="settings-form">
+                    <input type="text" id="help-subject" name="subject" placeholder="Assunto" required>
+                    <input type="email" id="help-email" name="email" placeholder="Seu email" required>
+                    <textarea id="help-message" name="message" placeholder="Descreva sua duvida ou problema" required></textarea>
+                    <button type="submit" class="btn">Enviar pedido de ajuda</button>
+                </form>
+                <div id="help-list" class="settings-list"></div>
             </section>
         </div>
     </aside>

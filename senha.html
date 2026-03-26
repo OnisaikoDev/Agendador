@@ -4,26 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
-    <title>Recuperar Senha | Agenda da Manicure</title>
+    <link rel="icon" type="image/png" href="img/ico.png">
+    <title>Recuperar Senha | Auralynne</title>
 </head>
 <body>
     <main class="auth-page">
+        <!-- texto de apoio da recuperacao -->
         <section class="hero-copy">
             <h1>Recuperar senha</h1>
             <p>Informe seu email para receber as instrucoes de acesso.</p>
         </section>
 
+        <!-- formulario para pedir recuperacao de senha -->
         <form class="card auth-form" id="recovery-form" action="#" method="post">
             <fieldset>
                 <legend>Recuperacao de senha</legend>
 
                 <div id="cadastro">
+                    <!-- aqui a pessoa informa o email dela -->
                     <input id="recovery-email" type="email" placeholder="voce@email.com" required name="email" autocomplete="email">
                 </div>
 
                 <div class="action">
                     <button type="submit" class="btn">Recuperar senha</button>
                 </div>
+
+                <p class="register-text">Depois do envio, voce sera levada para a etapa de criar uma nova senha.</p>
 
                 <div class="divider" aria-hidden="true">
                     <span></span>

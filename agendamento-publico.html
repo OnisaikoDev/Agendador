@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="img/ico.png">
+    <title>Agendamento | Auralynne</title>
+</head>
+<body class="public-booking-page">
+    <main class="public-booking-shell">
+        <section class="public-booking-card">
+            <img id="public-booking-logo" src="img/ico.png" alt="Logo Auralynne" class="public-booking-logo">
+            <h1 id="public-booking-title">Agende seu horario</h1>
+            <p id="public-booking-subtitle">Escolha o servico, a profissional e veja apenas os horarios disponiveis.</p>
+
+            <div id="public-booking-status" class="empty-state" hidden></div>
+
+            <form id="public-booking-form" class="settings-form">
+                <input type="text" name="name" placeholder="Seu nome" required>
+                <input type="tel" name="phone" placeholder="Seu telefone" required>
+                <select id="public-service" name="service" required></select>
+                <select id="public-professional" name="professional" required></select>
+                <input type="date" id="public-date" name="date" required>
+                <select id="public-time" name="time" required>
+                    <option value="">Selecione um horario disponivel</option>
+                </select>
+                <button type="submit" class="btn">Confirmar agendamento</button>
+            </form>
+        </section>
+    </main>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

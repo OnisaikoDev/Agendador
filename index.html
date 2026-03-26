@@ -4,29 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
-    <title>Login | Agenda da Manicure</title>
+    <link rel="icon" type="image/png" href="img/ico.png">
+    <title>Login | Auralynne</title>
 </head>
 <body>
     <main class="auth-page">
+        <!-- aqui fica a apresentacao principal da tela de login -->
         <section class="hero-copy">
-            <h1>Bem-vinda!</h1>
-            <p>Acesse sua conta para agendar seus horarios com rapidez.</p>
+            <img src="img/0a9de795-2aa3-4b77-90eb-af8722986f81.png" alt="Logo Auralynne" class="hero-logo">
+            <h1>Bem-vinda a Auralynne!</h1>
+            <p>Acesse sua conta para gerenciar seus horarios com rapidez.</p>
         </section>
 
+        <!-- formulario de entrada da usuaria -->
         <form class="card auth-form" id="login-form" action="#" method="post">
             <fieldset>
-                <legend>Entrar na conta</legend>
-
+                <!-- campo de usuario -->
                 <div class="input-group">
                     <img src="img/perfil.png" class="icon" alt="">
                     <input id="username" type="text" placeholder="Digite seu usuario" required name="username" autocomplete="username">
                 </div>
 
+                <!-- campo de senha -->
                 <div class="input-group">
                     <img src="img/cadeado.png" class="icon" alt="">
                     <input id="password" type="password" placeholder="Digite sua senha" required name="password" autocomplete="current-password">
                 </div>
 
+                <!-- parte de lembrar login e recuperar senha -->
                 <div class="rem">
                     <div class="checkbox-group">
                         <input type="checkbox" id="remember" name="remember">
@@ -35,6 +40,7 @@
                     <a href="senha.html" class="forgot-password">Esqueceu sua senha?</a>
                 </div>
 
+                <!-- botao principal para entrar -->
                 <div class="action">
                     <button type="submit" class="btn">Entrar</button>
                 </div>
@@ -43,6 +49,7 @@
                     <span></span>
                 </div>
 
+                <!-- link para criar conta nova -->
                 <p class="register-text">
                     Nao tem uma conta? <a href="cadastro.html">Cadastre-se</a>
                 </p>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="img/ico.png">
+    <title>Administrador | Auralynne</title>
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-shell admin-shell">
+        <!-- cabecalho do painel admin -->
+        <header class="dashboard-header">
+            <div class="header-logo">
+                <img src="img/ico.png" alt="Logo Auralynne">
+            </div>
+
+            <!-- menu central do admin -->
+            <nav class="header-menu" aria-label="Menu principal">
+                <ul class="menu">
+                    <li class="active">Auralynne Admin</li>
+                    <li id="open-admin-users-panel">Usuarios</li>
+                    <li id="open-admin-bills-panel">Boletos</li>
+                </ul>
+            </nav>
+
+            <!-- logout do admin -->
+            <button class="logout" type="button">Sair</button>
+        </header>
+
+        <!-- area principal deixando em destaque usuarios e central de ajuda -->
+        <main class="dashboard-container admin-main-grid">
+            <section class="dashboard-card">
+                <div class="calendar-panel">
+                    <h2>Configuracao de usuarios</h2>
+                    <div id="admin-users-overview" class="settings-list"></div>
+                </div>
+            </section>
+
+            <section class="dashboard-card">
+                <div class="calendar-panel">
+                    <h2>Central de ajuda</h2>
+                    <div id="admin-help-list" class="settings-list"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- drawer de usuarios -->
+    <aside class="booking-drawer" id="admin-users-drawer" aria-hidden="true">
+        <div class="booking-drawer-card settings-card">
+            <div class="drawer-header">
+                <h2>Gerenciar usuarios</h2>
+                <button type="button" class="drawer-close" id="close-admin-users-panel">&times;</button>
+            </div>
+
+            <!-- formulario de criacao de usuario -->
+            <form id="admin-user-form" class="settings-form admin-user-form">
+                <input type="text" name="name" placeholder="Nome" required>
+                <input type="text" name="lastname" placeholder="Sobrenome" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="tel" name="phone" placeholder="Telefone" required>
+                <input type="text" name="username" placeholder="Usuario" required>
+                <input type="password" name="password" placeholder="Senha" required>
+                <input type="file" name="logo_file" accept="image/*">
+                <button type="submit" class="btn">Criar usuario</button>
+            </form>
+
+            <!-- lista com todos os usuarios do sistema -->
+            <div id="admin-users-list" class="settings-list"></div>
+        </div>
+    </aside>
+
+    <!-- drawer de boletos -->
+    <aside class="booking-drawer" id="admin-bills-drawer" aria-hidden="true">
+        <div class="booking-drawer-card settings-card">
+            <div class="drawer-header">
+                <h2>Gerenciar boletos</h2>
+                <button type="button" class="drawer-close" id="close-admin-bills-panel">&times;</button>
+            </div>
+
+            <!-- formulario para lancar boleto -->
+            <form id="admin-bill-form" class="settings-form">
+                <select id="admin-bill-user" name="username" required></select>
+                <input type="text" name="description" placeholder="Descricao do boleto" required>
+                <input type="date" name="dueDate" required>
+                <input type="text" name="amount" placeholder="Valor" required>
+                <select name="billType" required>
+                    <option value="manual">Boleto manual</option>
+                    <option value="plan">Mensalidade do plano</option>
+                </select>
+                <button type="submit" class="btn">Lancar boleto</button>
+            </form>
+
+            <input type="text" id="admin-bill-search" placeholder="Pesquisar usuario por nome, email ou login">
+
+            <!-- lista de boletos separados por usuario -->
+            <div id="admin-bills-list" class="settings-list"></div>
+        </div>
+    </aside>
+
+    <div class="drawer-backdrop" id="admin-drawer-backdrop" hidden></div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

@@ -4,20 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
-    <title>Cadastro | Agenda da Manicure</title>
+    <link rel="icon" type="image/png" href="img/ico.png">
+    <title>Cadastro | Auralynne</title>
 </head>
 <body>
     <main class="auth-page">
+        <!-- parte visual de apresentacao da tela -->
         <section class="hero-copy">
-            <h1>Crie sua conta</h1>
-            <p>Cadastre-se para agendar horarios e acompanhar seus atendimentos.</p>
+            <h1>Crie sua conta na Auralynne</h1>
+            <p>Cadastre-se para organizar horarios e acompanhar seus atendimentos.</p>
         </section>
 
+        <!-- formulario de cadastro da usuaria -->
         <form class="card auth-form" id="register-form" action="#" method="post">
             <fieldset>
                 <legend>Criar conta</legend>
 
                 <div id="cadastro">
+                    <!-- dados basicos da usuaria -->
                     <input id="name" type="text" placeholder="Seu nome" required name="name" autocomplete="given-name">
 
                     <input id="lastname" type="text" placeholder="Seu sobrenome" required name="lastname" autocomplete="family-name">
@@ -32,6 +36,44 @@
 
                     <input id="confirm-password" type="password" placeholder="Repita a senha" required name="confirm_password" autocomplete="new-password" minlength="6">
 
+                    <!-- area dos planos disponiveis no sistema -->
+                    <div class="plans-box">
+                        <p class="plans-title">Escolha seu plano</p>
+                        <label class="plan-option">
+                            <input type="radio" name="plan" value="none" checked>
+                            <span>Sem plano agora</span>
+                        </label>
+                        <label class="plan-option">
+                            <input type="radio" name="plan" value="basico">
+                            <span>Basico - R$ 59/mensal</span>
+                        </label>
+                        <label class="plan-option">
+                            <input type="radio" name="plan" value="line">
+                            <span>Line - R$ 79/mensal</span>
+                        </label>
+                        <label class="plan-option">
+                            <input type="radio" name="plan" value="saloon">
+                            <span>Saloon - R$ 89/mensal</span>
+                        </label>
+
+                        <select name="payment_method" id="payment-method">
+                            <option value="">Forma de pagamento</option>
+                            <option value="boleto">Boleto</option>
+                            <option value="pix">Pix</option>
+                            <option value="credito">Cartao de credito</option>
+                            <option value="debito">Cartao de debito</option>
+                        </select>
+
+                        <select name="plan_due_day" id="plan-due-day">
+                            <option value="">Dia do pagamento</option>
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                            <option value="20">20</option>
+                        </select>
+                    </div>
+
+                    <!-- botao de criar a conta -->
                     <button type="submit" class="btn">Cadastrar</button>
                 </div>
 
