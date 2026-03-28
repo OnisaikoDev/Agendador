@@ -6,9 +6,9 @@
 
 ## 💻 Sobre o Projeto
 
-Este projeto é um sistema de agendamento desenvolvido com foco em facilitar a organização de horários e atendimentos, especialmente para profissionais autônomos como manicures, barbeiros e prestadores de serviços.
+Este é um sistema de agendamento desenvolvido para organizar horários de forma simples e eficiente.
 
-A aplicação permite o controle de horários de forma simples, intuitiva e eficiente, proporcionando uma melhor experiência tanto para o profissional quanto para o cliente.
+O projeto foi criado com foco em praticar desenvolvimento front-end e simular uma aplicação real de gerenciamento de horários.
 
 ---
 
@@ -17,19 +17,15 @@ A aplicação permite o controle de horários de forma simples, intuitiva e efic
 - HTML5  
 - CSS3  
 - JavaScript  
-- (Possível integração futura com backend)  
 
 ---
 
 ## ✨ Funcionalidades
 
-- 📅 Criação e visualização de agendamentos  
-- ⏰ Organização de horários disponíveis  
-- 👤 Registro de clientes  
-- 📱 Interface responsiva (adaptável a celular)  
-- ⚡ Sistema leve e de fácil utilização  
-
----
+- 📅 Visualização de agenda  
+- ⏰ Organização de horários  
+- 📱 Interface responsiva  
+- ⚡ Navegação simples e intuitiva  
 
 
 ---
@@ -42,9 +38,6 @@ Agendador/
 ├── index.html
 ├── style.css
 ├── script.js
-├── assets/
-│   ├── imagens
-│   └── ícones
 ```
 
 ---
@@ -65,23 +58,20 @@ cd Agendador
 
 ## 📈 Objetivo
 
-Este projeto foi desenvolvido com o objetivo de:
+Este projeto tem como objetivo:
 
 - Praticar desenvolvimento front-end  
-- Criar uma solução real para agendamentos  
-- Evoluir para um sistema completo com backend futuramente  
-
-Sistemas de agendamento são amplamente utilizados para organizar atendimentos e melhorar a gestão de serviços, permitindo controle de horários e clientes de forma eficiente :contentReference[oaicite:0]{index=0}  
+- Melhorar organização de código  
+- Criar uma base para evoluir para um sistema completo  
 
 ---
 
 ## 🔮 Melhorias Futuras
 
-- 🔐 Sistema de login/autenticação  
-- ☁️ Integração com banco de dados  
-- 📲 Notificações automáticas  
-- 📊 Dashboard administrativo  
-- 💳 Integração com pagamentos  
+- 🔐 Sistema de login  
+- 💾 Integração com backend  
+- 📊 Painel administrativo  
+- 📲 Melhorias na experiência do usuário  
 
 ---
 
