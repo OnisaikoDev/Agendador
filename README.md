@@ -31,9 +31,6 @@ A aplicação permite o controle de horários de forma simples, intuitiva e efic
 
 ---
 
-## 📸 Preview
-
-![Preview do Sistema](https://via.placeholder.com/1200x600?text=Sistema+de+Agendamento)
 
 ---
 
