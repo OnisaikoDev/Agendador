@@ -30,18 +30,6 @@ O projeto foi criado com foco em praticar desenvolvimento front-end e simular um
 
 ---
 
-## 📁 Estrutura do Projeto
-
-```
-Agendador/
-│
-├── index.html
-├── style.css
-├── script.js
-```
-
----
-
 ## 🚀 Como Rodar o Projeto
 
 ```bash
