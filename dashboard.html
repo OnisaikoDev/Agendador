@@ -7,6 +7,7 @@
     <link rel="icon" type="image/png" href="img/ico.png">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/colorthief/2.3.2/color-thief.min.js"></script>
     <title>Dashboard | Auralynne</title>
 </head>
 <body class="dashboard-page">
@@ -17,7 +18,7 @@
                 <img id="user-logo" src="img/ico.png" alt="Logo Auralynne">
             </div>
 
-            <!-- menu principal da tela -->
+            <!-- menu principal da tela (desktop) / titulo centralizado (mobile) -->
             <nav class="header-menu" aria-label="Menu principal">
                 <ul class="menu">
                     <li id="open-booking-panel">Agendamento</li>
@@ -25,15 +26,21 @@
                     <li id="open-settings-panel">Configuracoes</li>
                 </ul>
             </nav>
+            <span class="header-title-mobile" aria-hidden="true">Auralynne</span>
 
-            <!-- botao de sair da conta -->
-            <button class="logout" type="button">Sair</button>
+            <!-- botoes da direita: compartilhar + sair -->
+            <div class="header-right">
+                <button type="button" class="header-share-btn" id="share-booking-link-header" title="Compartilhar link de agendamento">
+                    🔗 Link
+                </button>
+                <button class="logout" type="button">Sair</button>
+            </div>
         </header>
 
         <main class="dashboard-container">
             <section class="dashboard-card">
                 <div class="calendar-panel">
-                    <!-- cabecalho do calendario com as setinhas e a data -->
+                    <!-- cabecalho do calendario com as setinhas, data e relogio -->
                     <div class="calendar-topbar">
                         <div class="calendar-nav">
                             <button type="button" class="calendar-arrow" id="calendar-prev">&#8249;</button>
@@ -47,6 +54,9 @@
                         <!-- aqui fica o calendario principal -->
                         <div id="calendar"></div>
                     </div>
+
+                    <!-- Lista de agendamentos para mobile -->
+                    <div id="agendamentos-lista-mobile" class="agendamentos-lista-mobile"></div>
                 </div>
             </section>
         </main>
@@ -66,10 +76,7 @@
                 <datalist id="client-suggestions"></datalist>
                 <input type="tel" id="telefone" name="telefone" placeholder="Telefone" required>
                 <select id="profissional" name="profissional" required>
-                    <option value="1">Maria</option>
-                    <option value="2">Ana</option>
-                    <option value="3">Joana</option>
-                    <option value="4">Carla</option>
+                    <!-- opcoes preenchidas dinamicamente pelo script.js via renderProfessionalOptions() -->
                 </select>
                 <select id="servico" name="servico" required></select>
                 <input type="date" id="data" name="data" required>
@@ -95,6 +102,37 @@
                 <input type="text" id="client-note" name="note" placeholder="Observacao">
                 <button type="submit" class="btn">Cadastrar cliente</button>
             </form>
+
+            <!-- historico de clientes com ultimos agendamentos -->
+            <h3 style="margin: 20px 0 12px; font-size: 1.1rem; font-weight: 700;">Clientes e Últimos Agendamentos</h3>
+            <div id="client-history-list" class="settings-list"></div>
+        </div>
+    </aside>
+
+    <!-- drawer lateral para editar agendamento -->
+    <aside class="booking-drawer edit-drawer" id="edit-booking-drawer" aria-hidden="true">
+        <div class="booking-drawer-card">
+            <div class="drawer-header">
+                <h2>Editar agendamento</h2>
+                <div style="display: flex; gap: 6px;">
+                    <button type="button" class="header-danger-btn" id="header-delete-event" title="Cancelar agendamento">🗑️</button>
+                    <button type="button" class="drawer-close" id="close-edit-booking-panel">&times;</button>
+                </div>
+            </div>
+
+            <!-- formulario para editar agendamento -->
+            <form id="edit-agendamento">
+                <input type="hidden" id="edit-event-id">
+                <input type="text" id="edit-nome" name="nome" placeholder="Nome" list="client-suggestions" required>
+                <input type="tel" id="edit-telefone" name="telefone" placeholder="Telefone" required>
+                <select id="edit-profissional" name="profissional" required>
+                    <!-- opcoes preenchidas dinamicamente pelo script.js via renderProfessionalOptions() -->
+                </select>
+                <select id="edit-servico" name="servico" required></select>
+                <input type="date" id="edit-data" name="data" required>
+                <input type="time" id="edit-horario" name="horario" required>
+                <button type="submit" class="btn">Salvar mudancas</button>
+            </form>
         </div>
     </aside>
 
@@ -108,18 +146,29 @@
 
             <!-- botoes das abas de configuracao -->
             <div class="settings-menu">
-                <button type="button" class="settings-tab active" data-settings-tab="cancelamentos">Cancelamento</button>
+                <button type="button" class="settings-tab" data-settings-tab="empresa">Empresa</button>
                 <button type="button" class="settings-tab" data-settings-tab="funcionarios">Funcionarios</button>
                 <button type="button" class="settings-tab" data-settings-tab="servicos">Servicos</button>
+                <button type="button" class="settings-tab" data-settings-tab="cancelamentos">Cancelamento</button>
                 <button type="button" class="settings-tab" data-settings-tab="financeiro">Financeiro</button>
-                <button type="button" class="settings-tab" data-settings-tab="linkexterno">Link externo</button>
                 <button type="button" class="settings-tab" data-settings-tab="ajuda">Ajuda</button>
             </div>
 
-            <!-- area para cancelar horarios ja criados -->
-            <section class="settings-panel active" data-settings-panel="cancelamentos">
-                <h3>Cancelar agendamentos</h3>
-                <div id="scheduled-list" class="settings-list"></div>
+            <!-- area para configurar dados da empresa -->
+            <section class="settings-panel active" data-settings-panel="empresa">
+                <h3>Configuracoes da empresa</h3>
+                
+                <h4 style="margin: 16px 0 8px; font-size: 0.95rem; font-weight: 600;">Logo da empresa</h4>
+                <form id="logo-form" class="settings-form">
+                    <input type="file" id="logo-upload" name="logo" accept="image/*" required>
+                    <button type="submit" class="btn">Enviar Logo</button>
+                </form>
+                
+                <h4 style="margin: 16px 0 8px; font-size: 0.95rem; font-weight: 600;">Nome da empresa</h4>
+                <form id="company-form" class="settings-form">
+                    <input type="text" id="company-name" name="companyName" placeholder="Digite o nome da sua empresa">
+                    <button type="submit" class="btn">Salvar</button>
+                </form>
             </section>
 
             <!-- area para adicionar ou remover funcionarias -->
@@ -149,19 +198,16 @@
                 <div id="service-list" class="settings-list"></div>
             </section>
 
+            <!-- area para cancelar horarios ja criados -->
+            <section class="settings-panel" data-settings-panel="cancelamentos">
+                <h3>Cancelar agendamentos</h3>
+                <div id="scheduled-list" class="settings-list"></div>
+            </section>
+
             <!-- area financeira com os boletos do sistema -->
             <section class="settings-panel" data-settings-panel="financeiro">
                 <h3>Boletos do sistema</h3>
                 <div id="finance-list" class="settings-list"></div>
-            </section>
-
-            <section class="settings-panel" data-settings-panel="linkexterno">
-                <h3>Link de agendamento externo</h3>
-                <form id="company-form" class="settings-form">
-                    <input type="text" id="company-name" name="companyName" placeholder="Nome da empresa">
-                    <button type="submit" class="btn">Salvar nome da empresa</button>
-                </form>
-                <div id="external-link-panel" class="settings-list"></div>
             </section>
 
             <section class="settings-panel" data-settings-panel="ajuda">
@@ -178,6 +224,30 @@
     </aside>
 
     <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+
+    <!-- Nav inferior mobile estilo Instagram -->
+    <nav class="mobile-bottom-nav" aria-label="Menu mobile">
+        <button type="button" id="mobile-nav-agenda" class="active">
+            <span class="nav-icon">📅</span>
+            <span class="nav-label">Agenda</span>
+        </button>
+        <button type="button" id="mobile-nav-agendar">
+            <span class="nav-icon">➕</span>
+            <span class="nav-label">Agendar</span>
+        </button>
+        <button type="button" id="mobile-nav-clientes">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">Clientes</span>
+        </button>
+        <button type="button" id="mobile-nav-config">
+            <span class="nav-icon">⚙️</span>
+            <span class="nav-label">Config</span>
+        </button>
+        <button type="button" id="mobile-nav-share">
+            <span class="nav-icon">🔗</span>
+            <span class="nav-label">Link</span>
+        </button>
+    </nav>
 
     <script src="js/script.js"></script>
 </body>
