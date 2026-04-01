@@ -326,12 +326,39 @@ a:focus {
     background: linear-gradient(180deg, #f47f9d, #ec7292);
     border-radius: 18px;
     display: grid;
-    grid-template-columns: 120px 1fr 120px;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
     padding: 13px 20px;
     box-sizing: border-box;
     box-shadow: 0 12px 26px rgba(181, 62, 91, 0.16);
     column-gap: 12px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-self: end;
+}
+
+.header-share-btn {
+    width: auto;
+    margin: 0;
+    padding: 7px 13px;
+    background: rgba(255, 255, 255, 0.18);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: none;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.header-share-btn:hover {
+    background: rgba(255, 255, 255, 0.28);
 }
 
 .topbar-links span {
@@ -363,6 +390,10 @@ a:focus {
     align-items: center;
     justify-content: center;
     min-width: 0;
+}
+
+.header-title-mobile {
+    display: none;
 }
 
 .menu {
@@ -406,7 +437,6 @@ a:focus {
     box-shadow: 0 8px 16px rgba(115, 20, 36, 0.14);
     border-radius: 10px;
     font-size: 0.95rem;
-    justify-self: end;
 }
 
 .dashboard-container {
@@ -422,6 +452,8 @@ a:focus {
     padding: 22px;
     box-shadow: 0 18px 36px rgba(191, 86, 111, 0.14);
     border: 1px solid rgba(255, 255, 255, 0.72);
+    max-width: 100%;
+    overflow-x: auto;
 }
 
 .calendar-panel h2,
@@ -494,6 +526,67 @@ a:focus {
     color: #111;
     font-size: 0.95rem;
     height: 42px;
+}
+
+
+/* --- Barra de acoes rapidas acima do calendario --- */
+.calendar-actions-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.cal-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    width: auto;
+    margin: 0;
+    padding: 10px 18px;
+    border-radius: 12px;
+    border: none;
+    background: var(--primary);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(233, 75, 106, 0.22);
+    transition: background-color 0.2s, transform 0.15s;
+}
+
+.cal-action-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.cal-action-btn:active {
+    transform: translateY(0);
+}
+
+.cal-action-share {
+    background: white;
+    color: var(--primary);
+    border: 1.5px solid #f0c4d0;
+    box-shadow: 0 4px 12px rgba(233, 75, 106, 0.08);
+}
+
+.cal-action-share:hover {
+    background: #fff5f8;
+    color: var(--primary-dark);
+}
+
+.cal-action-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+/* cursor de ponteiro nos slots vazios do calendario */
+.fc-timegrid-slot-lane {
+    cursor: pointer;
+}
+
+.fc-timegrid-slot-lane:hover {
+    background: rgba(239, 111, 145, 0.06) !important;
 }
 
 .calendar-topbar {
@@ -692,6 +785,27 @@ a:focus {
     font-size: 1.7rem;
     line-height: 1;
     box-shadow: none;
+}
+
+.header-danger-btn {
+    width: 38px;
+    height: 38px;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #ffcce0;
+    border-radius: 10px;
+    background: #ffe6f0;
+    color: #d91d4a;
+    font-size: 1.3rem;
+    line-height: 1;
+    box-shadow: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.header-danger-btn:hover {
+    background: #ffc9da;
+    border-color: #ff9aa2;
 }
 
 .drawer-backdrop {
@@ -1564,5 +1678,388 @@ a:focus {
     .menu li {
         padding: 9px 12px;
         font-size: 0.88rem;
+    }
+}
+
+/* =====================================================
+   LAYOUT MOBILE - RESPONSIVO PARA QUALQUER TELEFONE
+   Header fixo no topo, calendario que cabe na tela,
+   nav fixo no rodape sem precisar rolar.
+   ===================================================== */
+@media (max-width: 600px) {
+
+    /* --- Reset da pagina --- */
+    .dashboard-page {
+        padding: 0;
+        background-position: center top;
+        /* altura exata da viewport, sem overflow vertical */
+        height: 100dvh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .dashboard-shell {
+        width: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    /* --- Header mobile --- */
+    .dashboard-header {
+        position: relative;
+        flex-shrink: 0;
+        border-radius: 0;
+        display: flex;
+        align-items: center;
+        padding: 10px 14px;
+        gap: 0;
+        box-shadow: 0 2px 12px rgba(181, 62, 91, 0.18);
+        /* grid desktop vira flex no mobile */
+        grid-template-columns: unset;
+    }
+
+    .header-logo {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+    }
+
+    .header-menu {
+        display: none;
+    }
+
+    .header-menu.mobile-visible {
+        display: flex;
+        flex: 1;
+        justify-content: center;
+        border-left: 6px solid rgba(255, 255, 255, 0.35);
+        border-right: 6px solid rgba(255, 255, 255, 0.35);
+        padding: 0 8px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Titulo centralizado com position absolute */
+    .header-title-mobile {
+        display: block;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: white;
+        letter-spacing: 0.02em;
+        pointer-events: none;
+        white-space: nowrap;
+    }
+
+    /* Oculta o grupo desktop (share + sair) e mostra so o sair compacto */
+    .header-right {
+        margin-left: auto;
+        gap: 6px;
+    }
+
+    .header-share-btn {
+        display: none;
+    }
+
+    .logout {
+        padding: 6px 11px;
+        font-size: 0.76rem;
+        border-radius: 8px;
+        white-space: nowrap;
+        box-shadow: none;
+    }
+
+    /* --- Container principal: ocupa o espaco restante entre header e nav --- */
+    .dashboard-container {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        /* padding bottom = altura do nav + folga */
+        padding: 12px 14px 80px;
+        margin: 0 auto;
+        max-width: 360px;
+        width: 100%;
+        box-sizing: border-box;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .dashboard-card {
+        padding: 12px;
+        border-radius: 14px;
+    }
+
+    /* --- Calendario cabe na tela --- */
+    .calendar-panel {
+        padding: 10px 10px;
+        border-radius: 12px;
+    }
+
+    .calendar-topbar {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .calendar-topbar h2 {
+        font-size: 0.85rem;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 0;
+    }
+
+    .calendar-clock {
+        font-size: 0.76rem;
+        padding: 4px 8px;
+        justify-self: end;
+    }
+
+    .calendar-nav {
+        justify-self: start;
+    }
+
+    .calendar-arrow {
+        width: 30px;
+        height: 28px;
+        font-size: 1.3rem;
+    }
+
+    /* ESCONDER CALENDARIO NO MOBILE */
+    #calendar {
+        display: none;
+    }
+
+    /* LISTA DE AGENDAMENTOS EM CARDS NO MOBILE */
+    .agendamentos-lista-mobile {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .agendamento-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 250, 252, 0.9));
+        border: 1px solid rgba(239, 111, 145, 0.2);
+        border-radius: 12px;
+        padding: 12px;
+        box-shadow: 0 2px 8px rgba(181, 62, 91, 0.08);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .agendamento-card:hover {
+        border-color: rgba(239, 111, 145, 0.5);
+        box-shadow: 0 4px 16px rgba(181, 62, 91, 0.15);
+        transform: translateY(-2px);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 251, 0.95));
+    }
+
+    .agendamento-card .card-time {
+        background: linear-gradient(135deg, #f47f9d, #ec7292);
+        color: white;
+        border-radius: 8px;
+        padding: 8px 12px;
+        text-align: center;
+        min-width: 55px;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+
+    .agendamento-card .card-time-label {
+        font-size: 0.65rem;
+        opacity: 0.8;
+    }
+
+    .agendamento-card .card-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .agendamento-card .card-cliente {
+        font-weight: 600;
+        color: var(--text);
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .agendamento-card .card-servico {
+        font-size: 0.8rem;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .agendamento-card .card-profissional {
+        font-size: 0.75rem;
+        color: #999;
+        display: flex;
+        gap: 4px;
+        margin-top: 2px;
+    }
+
+    .agendamento-card .card-profissional::before {
+        content: "👤";
+    }
+
+    /* Slots menores para caber mais no viewport */
+    .fc-timegrid-slot {
+        height: 22px;
+    }
+
+    .fc .fc-col-header-cell-cushion {
+        font-size: 0.72rem;
+        padding: 3px 2px;
+    }
+
+    .fc-timegrid-slot-label-cushion,
+    .fc-timegrid-axis-cushion {
+        font-size: 0.7rem;
+    }
+
+    /* --- Drawer vira bottom sheet --- */
+    .booking-drawer {
+        top: auto;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        width: 100%;
+        height: 90dvh;
+        transform: translateY(100%);
+        padding: 0;
+        transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+
+    .booking-drawer.is-open {
+        transform: translateY(0);
+    }
+
+    .booking-drawer-card {
+        height: 100%;
+        border-radius: 22px 22px 0 0;
+        border-left: none;
+        border-top: 1px solid #f0d6dd;
+        padding: 8px 18px 24px;
+        box-shadow: 0 -14px 38px rgba(96, 45, 60, 0.18);
+        overflow-y: auto;
+    }
+
+    /* Alca visual */
+    .booking-drawer-card::before {
+        content: "";
+        display: block;
+        width: 40px;
+        height: 4px;
+        border-radius: 999px;
+        background: #e0c8d0;
+        margin: 0 auto 16px;
+    }
+
+    /* --- Settings tabs 3 colunas --- */
+    .settings-menu {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+    }
+
+    .settings-tab {
+        padding: 7px 4px;
+        font-size: 0.75rem;
+        border-radius: 9px;
+    }
+
+    /* --- Nav inferior fixo --- */
+    .mobile-bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 40;
+        display: flex;
+        align-items: stretch;
+        background: rgba(255, 255, 255, 0.97);
+        border-top: 1px solid #f0d7df;
+        box-shadow: 0 -4px 20px rgba(181, 62, 91, 0.1);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        /* altura fixa + safe area do iPhone */
+        height: calc(58px + env(safe-area-inset-bottom));
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .mobile-bottom-nav button {
+        flex: 1;
+        margin: 0;
+        padding: 6px 2px 4px;
+        border: none;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        color: #a07080;
+        font-size: 0.6rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: color 0.15s ease;
+        position: relative;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .mobile-bottom-nav button:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .mobile-bottom-nav button.active {
+        color: var(--primary);
+    }
+
+    .mobile-bottom-nav button.active::after {
+        content: "";
+        position: absolute;
+        bottom: 4px;
+        width: 4px;
+        height: 4px;
+        border-radius: 999px;
+        background: var(--primary);
+    }
+
+    .mobile-bottom-nav .nav-icon {
+        font-size: 1.35rem;
+        line-height: 1;
+    }
+
+    .mobile-bottom-nav .nav-label {
+        line-height: 1;
+    }
+}
+
+/* Esconde nav inferior em telas maiores */
+@media (min-width: 601px) {
+    .mobile-bottom-nav {
+        display: none;
+    }
+
+    /* Esconde action bar que so faz sentido no mobile */
+    .calendar-actions-bar {
+        display: none;
     }
 }
