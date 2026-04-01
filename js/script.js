@@ -1,16 +1,16 @@
 const STORAGE_KEYS = {
     // aqui eu concentrei todas as chaves que uso no localStorage
-    users: "manicure-users",
-    currentUser: "manicure-current-user",
-    loggedIn: "manicure-logged-in",
-    remember: "manicure-remember",
-    events: "manicure-events",
-    clients: "manicure-clients",
-    professionals: "manicure-professionals",
-    services: "manicure-services",
-    bills: "manicure-bills",
-    help: "manicure-help",
-    resetRequests: "manicure-reset-requests"
+    users: "auralynne-users",
+    currentUser: "auralynne-current-user",
+    loggedIn: "auralynne-logged-in",
+    remember: "auralynne-remember",
+    events: "auralynne-events",
+    clients: "auralynne-clients",
+    professionals: "auralynne-professionals",
+    services: "auralynne-services",
+    bills: "auralynne-bills",
+    help: "auralynne-help",
+    resetRequests: "auralynne-reset-requests"
 };
 
 const PLANS = {
@@ -32,6 +32,9 @@ const PLAN_DUE_DAYS = ["5", "10", "15", "20"];
 
 const DEFAULT_LOGO = "img/ico.png";
 
+// NOTA: a senha do admin padrao e armazenada como hash SHA-256.
+// Hash de "admin123" = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"
+// Para alterar a senha, gere um novo hash SHA-256 e substitua abaixo.
 const defaultAdminUser = {
     // usuario admin padrao para eu conseguir acessar o painel administrativo
     id: "admin-1",
@@ -41,7 +44,7 @@ const defaultAdminUser = {
     email: "admin@auralynne.com",
     phone: "(00) 00000-0000",
     username: "admin",
-    password: "admin123",
+    password: "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
     companyName: "Auralynne",
     logo: DEFAULT_LOGO,
     planId: "line",
@@ -176,9 +179,6 @@ function getUserProfessionals(username) {
     return getStoredProfessionals().filter((professional) => professional.owner === username);
 }
 
-function getOwnedProfessionals(username) {
-    return getStoredProfessionals().filter((professional) => professional.owner === username);
-}
 
 function saveUserProfessionals(username, userProfessionals) {
     const otherProfessionals = getStoredProfessionals().filter((professional) => professional.owner !== username);
@@ -242,6 +242,26 @@ function getPlanMeta(planId) { return PLANS[planId] || PLANS.none; }
 function hasActivePlan(user) { return user && user.planId !== "none" && user.planStatus === "active"; }
 function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
 
+async function hashPassword(password) {
+    // hash SHA-256 via Web Crypto API — nunca salva senha em texto puro
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(hashBuffer))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+}
+
+// Função para converter arquivo em Data URL
+function readFileAsDataURL(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("Erro ao ler arquivo"));
+        reader.readAsDataURL(file);
+    });
+}
+
 function normalizeLogoPath(path) {
     if (!path) {
         return DEFAULT_LOGO;
@@ -285,21 +305,6 @@ function formatDateOnly(date) {
     return `${year}-${month}-${day}`;
 }
 
-function addOneHour(dateString, timeString) {
-    // todo agendamento ganha 1 hora de duracao
-    const startDate = new Date(`${dateString}T${timeString}:00`);
-    const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
-    const formatLocalDate = (date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        const hours = String(date.getHours()).padStart(2, "0");
-        const minutes = String(date.getMinutes()).padStart(2, "0");
-        const seconds = String(date.getSeconds()).padStart(2, "0");
-        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-    };
-    return { start: formatLocalDate(startDate), end: formatLocalDate(endDate) };
-}
 
 function addDuration(dateString, timeString, durationInMinutes) {
     // aqui eu monto o horario final baseado na duracao do servico
@@ -468,13 +473,14 @@ function initLoginForm() {
     const form = document.getElementById("login-form");
     if (!form) { return; }
     const rememberInput = document.getElementById("remember");
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
         event.preventDefault();
         const formData = new FormData(form);
         const username = formData.get("username")?.toString().trim();
         const password = formData.get("password")?.toString().trim();
+        const hashedPassword = await hashPassword(password);
         const matchedUser = getStoredUsers().find(
-            (user) => user.username === username && user.password === password
+            (user) => user.username === username && user.password === hashedPassword
         );
         if (!matchedUser) {
             alert("Usuario ou senha invalidos.");
@@ -490,7 +496,7 @@ function initRegisterForm() {
     // parte do cadastro de usuario
     const form = document.getElementById("register-form");
     if (!form) { return; }
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
         event.preventDefault();
         const formData = new FormData(form);
         const password = formData.get("password")?.toString();
@@ -507,6 +513,7 @@ function initRegisterForm() {
         if (users.some((user) => user.email === email)) { alert("Esse email ja esta cadastrado."); return; }
         if (planId !== "none" && !paymentMethod) { alert("Escolha uma forma de pagamento para contratar um plano."); return; }
         if (planId !== "none" && !PLAN_DUE_DAYS.includes(planDueDay)) { alert("Escolha um dia de vencimento."); return; }
+        const hashedPassword = await hashPassword(password);
         const newUser = {
             id: `user-${Date.now()}`,
             role: "user",
@@ -515,7 +522,7 @@ function initRegisterForm() {
             email,
             phone: formData.get("phone")?.toString().trim(),
             username,
-            password,
+            password: hashedPassword,
             companyName: formData.get("name")?.toString().trim(),
             logo: DEFAULT_LOGO,
             planId,
@@ -544,6 +551,7 @@ function initRecoveryForm() {
         const requests = getStoredResetRequests().filter((request) => request.email !== email);
         requests.push({ id: `reset-${Date.now()}`, email, username: user.username, token, used: false });
         saveResetRequests(requests);
+        // TODO: remover o codigo do alert antes de ir para producao — apenas simulacao de envio de email
         alert(`Email de recuperacao enviado de forma simulada. Codigo: ${token}`);
         window.location.href = `resetar-senha.html?email=${encodeURIComponent(email)}`;
     });
@@ -556,7 +564,7 @@ function initResetPasswordForm() {
     const params = new URLSearchParams(window.location.search);
     const emailInput = document.getElementById("reset-email");
     if (emailInput && params.get("email")) { emailInput.value = params.get("email"); }
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
         event.preventDefault();
         const formData = new FormData(form);
         const email = formData.get("email")?.toString().trim();
@@ -567,10 +575,144 @@ function initResetPasswordForm() {
         const requests = getStoredResetRequests();
         const request = requests.find((item) => item.email === email && item.token === token && !item.used);
         if (!request) { alert("Codigo de recuperacao invalido."); return; }
-        saveUsers(getStoredUsers().map((user) => user.email === email ? { ...user, password } : user));
+        const hashedPassword = await hashPassword(password);
+        saveUsers(getStoredUsers().map((user) => user.email === email ? { ...user, password: hashedPassword } : user));
         saveResetRequests(requests.map((item) => item.id === request.id ? { ...item, used: true } : item));
         alert("Nova senha salva com sucesso.");
         window.location.href = "index.html";
+    });
+}
+
+let openEditBookingPanelFunc = null;
+
+function renderAgendamentosListaMobile(selectedDate) {
+    // renderiza os agendamentos em cards para o mobile do dia selecionado
+    const container = document.getElementById("agendamentos-lista-mobile");
+    if (!container) return;
+
+    const currentUser = getCurrentUser();
+    if (!currentUser) return;
+
+    const events = getUserEvents(currentUser.username);
+    const professionals = getUserProfessionals(currentUser.username);
+
+    container.innerHTML = "";
+
+    // converte a data selecionada para formato YYYY-MM-DD
+    const selectedDateStr = selectedDate ? formatDateOnly(selectedDate) : formatDateOnly(new Date());
+
+    // filtra apenas os agendamentos do dia selecionado
+    const dayEvents = events.filter((event) => {
+        const eventDate = event.start.split("T")[0];
+        return eventDate === selectedDateStr;
+    });
+
+    if (dayEvents.length === 0) {
+        container.innerHTML = `
+            <div style="padding: 20px; text-align: center; color: var(--muted);">
+                Nenhum agendamento nesse dia
+            </div>
+        `;
+        return;
+    }
+
+    // ordena por hora
+    const sortedEvents = [...dayEvents].sort((a, b) => new Date(a.start) - new Date(b.start));
+
+    sortedEvents.forEach((event) => {
+        const start = new Date(event.start);
+        const end = new Date(event.end);
+        const timeStr = `${String(start.getHours()).padStart(2, "0")}:${String(start.getMinutes()).padStart(2, "0")}`;
+        const endTimeStr = `${String(end.getHours()).padStart(2, "0")}:${String(end.getMinutes()).padStart(2, "0")}`;
+
+        const professional = professionals.find((p) => p.id === event.resourceId);
+        const professionalName = professional ? professional.title : "Profissional";
+
+        // extrai o nome do cliente do titulo do evento (formato: "Serviço - Cliente")
+        const [serviceName, clientName] = event.title.split(" - ").map((s) => s.trim());
+
+        const card = document.createElement("div");
+        card.className = "agendamento-card";
+        card.setAttribute("data-event-id", event.id);
+        card.innerHTML = `
+            <div class="card-time">
+                <div>${timeStr}</div>
+                <div class="card-time-label">${endTimeStr}</div>
+            </div>
+            <div class="card-info">
+                <div class="card-cliente">${clientName || "Cliente"}</div>
+                <div class="card-servico">${serviceName || "Serviço"}</div>
+                <div class="card-profissional">${professionalName}</div>
+            </div>
+        `;
+        card.addEventListener("click", () => {
+            if (openEditBookingPanelFunc) {
+                openEditBookingPanelFunc(event);
+            }
+        });
+        container.appendChild(card);
+    });
+}
+
+function renderClientHistory() {
+    // renderiza os clientes com seus últimos 5 agendamentos
+    const container = document.getElementById("client-history-list");
+    if (!container) return;
+
+    const currentUser = getCurrentUser();
+    if (!currentUser) return;
+
+    const clients = getStoredClients();
+    const events = getUserEvents(currentUser.username);
+
+    container.innerHTML = "";
+
+    if (clients.length === 0) {
+        container.innerHTML = `
+            <div style="padding: 20px; text-align: center; color: var(--muted);">
+                Nenhum cliente cadastrado ainda
+            </div>
+        `;
+        return;
+    }
+
+    clients.forEach((client) => {
+        // busca os últimos 5 agendamentos do cliente
+        const clientEvents = events
+            .filter((event) => {
+                const [_, eventClientName] = event.title.split(" - ").map((s) => s.trim());
+                return eventClientName === client.name;
+            })
+            .sort((a, b) => new Date(b.start) - new Date(a.start))
+            .slice(0, 5);
+
+        const clientDiv = document.createElement("div");
+        clientDiv.className = "settings-item";
+        
+        let eventsHTML = "";
+        if (clientEvents.length === 0) {
+            eventsHTML = '<span style="color: var(--muted); font-size: 0.85rem;">Sem agendamentos</span>';
+        } else {
+            eventsHTML = clientEvents.map((evt) => {
+                const startDate = new Date(evt.start).toLocaleDateString("pt-BR", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "2-digit"
+                });
+                const startTime = evt.start.slice(11, 16);
+                const [serviceName] = evt.title.split(" - ").map((s) => s.trim());
+                return `<span style="font-size: 0.85rem;">• ${serviceName} - ${startDate} ${startTime}</span>`;
+            }).join("<br>");
+        }
+
+        clientDiv.innerHTML = `
+            <div>
+                <strong>${client.name}</strong>
+                <span>${client.phone || "-"}</span>
+                ${eventsHTML}
+            </div>
+        `;
+        container.appendChild(clientDiv);
     });
 }
 
@@ -599,7 +741,7 @@ function initDashboard() {
     const closeClientPanel = document.getElementById("close-client-panel");
     const openSettingsPanel = document.getElementById("open-settings-panel");
     const closeSettingsPanel = document.getElementById("close-settings-panel");
-    const clientMenuItem = document.getElementById("open-client-panel");
+    const clientMenuItem = openClientPanel; // alias para controle de visibilidade por plano
     const clientForm = document.getElementById("client-form");
     const clientNameInput = document.getElementById("nome");
     const clientPhoneInput = document.getElementById("telefone");
@@ -615,14 +757,151 @@ function initDashboard() {
     const serviceList = document.getElementById("service-list");
     const financeList = document.getElementById("finance-list");
     const externalLinkPanel = document.getElementById("external-link-panel");
+    const logoForm = document.getElementById("logo-form");
+    const logoUpload = document.getElementById("logo-upload");
     const companyForm = document.getElementById("company-form");
     const companyNameInput = document.getElementById("company-name");
     const helpForm = document.getElementById("help-form");
     const helpList = document.getElementById("help-list");
     const userLogo = document.getElementById("user-logo");
     const calendarClock = document.getElementById("calendar-clock");
+    const editBookingDrawer = document.getElementById("edit-booking-drawer");
+    const closeEditBookingPanel = document.getElementById("close-edit-booking-panel");
+    const editAgendamentoForm = document.getElementById("edit-agendamento");
+    const editNomeInput = document.getElementById("edit-nome");
+    const editTelefoneInput = document.getElementById("edit-telefone");
+    const editProfissionalSelect = document.getElementById("edit-profissional");
+    const editServicoInput = document.getElementById("edit-servico");
+    const editDataInput = document.getElementById("edit-data");
+    const editHorarioInput = document.getElementById("edit-horario");
+    const btnDeleteEvent = document.getElementById("btn-delete-event");
+    const headerDeleteEvent = document.getElementById("header-delete-event");
     const today = new Date();
     const currentHour = String(today.getHours()).padStart(2, "0");
+
+    let currentEditingEvent = null;
+
+    function openEditBookingPanel(event) {
+        currentEditingEvent = event;
+        const [serviceName, clientName] = event.title.split(" - ").map((s) => s.trim());
+        const start = new Date(event.start);
+        
+        editNomeInput.value = clientName || "";
+        editServicoInput.value = serviceName || "";
+        editDataInput.value = event.start.split("T")[0];
+        editHorarioInput.value = event.start.slice(11, 16);
+        editProfissionalSelect.value = event.resourceId || "";
+        editTelefoneInput.value = "";
+        
+        openDrawer(editBookingDrawer);
+    }
+
+    openEditBookingPanelFunc = openEditBookingPanel;
+
+    closeEditBookingPanel?.addEventListener("click", () => closeAllDrawers());
+
+    editAgendamentoForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        
+        if (!currentEditingEvent) return;
+        
+        const novoNome = editNomeInput.value.trim();
+        const novoServico = editServicoInput.value.trim();
+        const novaData = editDataInput.value;
+        const novoHorario = editHorarioInput.value;
+        const novoProfissional = editProfissionalSelect.value;
+        
+        if (!novoNome || !novoServico || !novaData || !novoHorario || !novoProfissional) {
+            alert("Preencha todos os campos obrigatórios.");
+            return;
+        }
+        
+        // busca a duração do serviço
+        const services = getUserServices(currentUser.username);
+        const service = services.find((s) => s.name === novoServico);
+        const duration = service ? service.duration : 60;
+        
+        // calcula novo horário final
+        const { start: novoStart, end: novoEnd } = addDuration(novaData, novoHorario, duration);
+        
+        // atualiza o evento
+        const events = getUserEvents(currentUser.username);
+        const eventIndex = events.findIndex((e) => e.id === currentEditingEvent.id);
+        
+        if (eventIndex !== -1) {
+            const updatedEventData = {
+                ...events[eventIndex],
+                title: `${novoServico} - ${novoNome}`,
+                start: novoStart,
+                end: novoEnd,
+                resourceId: novoProfissional,
+                backgroundColor: getEventColor(novoServico)
+            };
+            
+            events[eventIndex] = updatedEventData;
+            saveUserEvents(currentUser.username, events);
+            
+            // atualiza o evento no calendário - remove e re-adiciona
+            const calendarEventId = currentEditingEvent.id;
+            const calendarEvent = calendar.getEventById(calendarEventId);
+            
+            if (calendarEvent) {
+                calendarEvent.remove();
+            }
+            
+            calendar.addEvent(updatedEventData);
+            
+            renderAgendamentosListaMobile(calendar.getDate());
+            renderClientHistory();
+            closeAllDrawers();
+            alert("Agendamento atualizado com sucesso!");
+        }
+    });
+
+    function handleDeleteEvent() {
+        if (!currentEditingEvent) return;
+        
+        const startLabel = new Date(currentEditingEvent.start).toLocaleString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+        
+        const shouldRemove = window.confirm(`Deseja cancelar o agendamento "${currentEditingEvent.title}" de ${startLabel}?`);
+        if (!shouldRemove) return;
+        
+        // Remove do localStorage - busca por data/hora, não só por ID
+        let events = getUserEvents(currentUser.username);
+        const eventStartTime = currentEditingEvent.start;
+        const eventEndTime = currentEditingEvent.end;
+        
+        const beforeCount = events.length;
+        events = events.filter((e) => {
+            const isSameEvent = (e.start === eventStartTime && e.end === eventEndTime) || (e.id === currentEditingEvent.id);
+            return !isSameEvent;
+        });
+        const afterCount = events.length;
+        
+        if (beforeCount === afterCount) {
+            alert("Erro ao deletar agendamento. Tente novamente.");
+            return;
+        }
+        
+        saveUserEvents(currentUser.username, events);
+        
+        // Sincroniza o calendário com os dados do localStorage
+        refreshCalendarEvents();
+        
+        renderAgendamentosListaMobile(calendar.getDate());
+        renderClientHistory();
+        closeAllDrawers();
+        alert("Agendamento cancelado com sucesso!");
+    }
+
+    btnDeleteEvent?.addEventListener("click", handleDeleteEvent);
+    headerDeleteEvent?.addEventListener("click", handleDeleteEvent);
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
         // configuracao principal do calendario
@@ -637,23 +916,30 @@ function initDashboard() {
         nowIndicator: true,
         height: 470,
         headerToolbar: false,
+        selectable: true,
+        selectMirror: true,
+        unselectAuto: true,
         resources: getUserProfessionals(currentUser.username),
         events: getUserEvents(currentUser.username),
         datesSet: () => updateCalendarTitle(),
+        // clique em slot vazio — pre-preenche o drawer com data, hora e profissional
+        dateClick: (info) => {
+            const dateVal = info.dateStr.slice(0, 10);
+            const timeVal = info.dateStr.slice(11, 16);
+            const dataInput = document.getElementById("data");
+            const horarioInput = document.getElementById("horario");
+            const profissionalSelect = document.getElementById("profissional");
+            if (dataInput) { dataInput.value = dateVal; }
+            if (horarioInput) { horarioInput.value = timeVal; }
+            // se clicou numa coluna de profissional especifica, pre-seleciona ela
+            if (info.resource && profissionalSelect) {
+                profissionalSelect.value = info.resource.id;
+            }
+            updateBookingTimeLimit();
+            openDrawer(bookingDrawer);
+        },
         eventClick: (info) => {
-            const startLabel = new Date(info.event.startStr).toLocaleString("pt-BR", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-            });
-            const shouldRemove = window.confirm(`Deseja cancelar o agendamento "${info.event.title}" de ${startLabel}?`);
-            if (!shouldRemove) { return; }
-            removeStoredEvent(info.event);
-            info.event.remove();
-            renderScheduledList();
-            alert("Agendamento cancelado com sucesso.");
+            openEditBookingPanelFunc(info.event);
         }
     });
 
@@ -678,8 +964,17 @@ function initDashboard() {
     }
 
     function applyUserLogo() {
+        // Sempre lê os dados atualizados do localStorage em tempo real
+        const updatedUser = getCurrentUser();
+        if (!updatedUser) { return; }
+        
         if (userLogo) {
-            userLogo.src = normalizeLogoPath(currentUser.logo);
+            userLogo.src = normalizeLogoPath(updatedUser.logo);
+        }
+        // atualiza o nome da empresa no header mobile
+        const headerTitleMobile = document.querySelector(".header-title-mobile");
+        if (headerTitleMobile) {
+            headerTitleMobile.textContent = updatedUser.companyName || updatedUser.name || "Auralynne";
         }
     }
 
@@ -751,7 +1046,7 @@ function initDashboard() {
 
     function renderEmployees() {
         if (employeeList) {
-            const ownedProfessionals = getOwnedProfessionals(currentUser.username);
+            const ownedProfessionals = getUserProfessionals(currentUser.username);
             employeeList.innerHTML = ownedProfessionals.length ? ownedProfessionals.map((professional) => `
                 <div class="settings-item">
                     <div>
@@ -909,7 +1204,7 @@ function initDashboard() {
             if (premiumMode) {
                 allowed = true;
             } else if (basicMode || noPlan) {
-                allowed = ["funcionarios", "financeiro", "linkexterno", "ajuda"].includes(name);
+                allowed = ["empresa", "funcionarios", "financeiro", "ajuda"].includes(name);
             }
 
             tab.style.display = allowed ? "" : "none";
@@ -944,6 +1239,7 @@ function initDashboard() {
             )
         );
         saveUserEvents(currentUser.username, updatedEvents);
+        renderAgendamentosListaMobile(calendar.getDate());
     }
 
     function syncCurrentUserData() {
@@ -1003,7 +1299,7 @@ function initDashboard() {
     }
 
     function closeAllDrawers() {
-        [bookingDrawer, clientDrawer, settingsDrawer].forEach((drawer) => {
+        [bookingDrawer, clientDrawer, settingsDrawer, editBookingDrawer].forEach((drawer) => {
             if (drawer) {
                 drawer.classList.remove("is-open");
                 drawer.setAttribute("aria-hidden", "true");
@@ -1035,6 +1331,7 @@ function initDashboard() {
     }
 
     calendar.render();
+    renderAgendamentosListaMobile(calendar.getDate());
     applyUserLogo();
     updateCalendarTitle();
     updateCalendarClock();
@@ -1042,9 +1339,22 @@ function initDashboard() {
     renderClientSuggestions();
     renderProfessionalOptions();
     renderServiceOptions();
+    // renderiza opções para o drawer de edição também
+    if (editProfissionalSelect) {
+        editProfissionalSelect.innerHTML = getUserProfessionals(currentUser.username).map((professional) =>
+            `<option value="${professional.id}">${professional.title}</option>`
+        ).join("");
+    }
+    if (editServicoInput) {
+        const services = getUserServices(currentUser.username);
+        editServicoInput.innerHTML = services.map((service) =>
+            `<option value="${service.name}">${service.name}</option>`
+        ).join("");
+    }
     ensureSelectedService();
     updateBookingTimeLimit();
     renderScheduledList();
+    renderClientHistory();
     renderEmployees();
     renderServices();
     renderFinance();
@@ -1053,8 +1363,37 @@ function initDashboard() {
     applyPlanAccess();
 
     openBookingPanel?.addEventListener("click", () => openDrawer(bookingDrawer));
-    openClientPanel?.addEventListener("click", () => openDrawer(clientDrawer));
+    openClientPanel?.addEventListener("click", () => {
+        renderClientHistory();
+        openDrawer(clientDrawer);
+    });
     openSettingsPanel?.addEventListener("click", () => openDrawer(settingsDrawer));
+
+    // funcao reutilizavel de compartilhar link
+    async function handleShareLink() {
+        const link = getExternalBookingLink();
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: `Agende com ${currentUser.companyName || currentUser.name}`,
+                    text: "Clique para agendar seu horario:",
+                    url: link
+                });
+                return;
+            } catch (err) {
+                if (err.name === "AbortError") { return; }
+            }
+        }
+        try {
+            await navigator.clipboard.writeText(link);
+            alert("Link copiado! Compartilhe com seus clientes.");
+        } catch (err) {
+            prompt("Copie o link abaixo:", link);
+        }
+    }
+
+    // botao compartilhar no header (desktop)
+    document.getElementById("share-booking-link-header")?.addEventListener("click", handleShareLink);
     closeBookingPanel?.addEventListener("click", closeAllDrawers);
     closeClientPanel?.addEventListener("click", closeAllDrawers);
     closeSettingsPanel?.addEventListener("click", closeAllDrawers);
@@ -1063,8 +1402,8 @@ function initDashboard() {
     clientNameInput?.addEventListener("blur", syncClientPhone);
     document.getElementById("data")?.addEventListener("change", updateBookingTimeLimit);
     settingsTabs.forEach((tab) => tab.addEventListener("click", () => switchSettingsTab(tab.dataset.settingsTab)));
-    prevButton?.addEventListener("click", () => { calendar.prev(); updateCalendarTitle(); });
-    nextButton?.addEventListener("click", () => { calendar.next(); updateCalendarTitle(); });
+    prevButton?.addEventListener("click", () => { calendar.prev(); updateCalendarTitle(); renderAgendamentosListaMobile(calendar.getDate()); });
+    nextButton?.addEventListener("click", () => { calendar.next(); updateCalendarTitle(); renderAgendamentosListaMobile(calendar.getDate()); });
     window.addEventListener("storage", (event) => {
         if (!event.key || Object.values(STORAGE_KEYS).includes(event.key)) {
             syncDashboardFromStorage(event.key || "");
@@ -1104,7 +1443,9 @@ function initDashboard() {
             alert("Esse funcionario ja possui um agendamento nesse horario.");
             return;
         }
+        const eventId = `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         const newEvent = {
+            id: eventId,
             title: `${servico} - ${nome}`,
             start: duration.start,
             end: duration.end,
@@ -1113,7 +1454,10 @@ function initDashboard() {
             extendedProps: { telefone, owner: currentUser.username }
         };
         calendar.addEvent(newEvent);
+        renderAgendamentosListaMobile(calendar.getDate());
+        renderClientHistory();
         saveUserEvents(currentUser.username, calendar.getEvents().map((calendarEvent) => ({
+            id: calendarEvent.id || eventId,
             title: calendarEvent.title,
             start: calendarEvent.startStr,
             end: calendarEvent.endStr,
@@ -1151,6 +1495,7 @@ function initDashboard() {
         }
         saveClients(clients);
         renderClientSuggestions();
+        renderClientHistory();
         alert("Cliente cadastrado com sucesso.");
         clientForm.reset();
         closeAllDrawers();
@@ -1160,7 +1505,7 @@ function initDashboard() {
         event.preventDefault();
         const name = new FormData(employeeForm).get("name")?.toString().trim();
         if (!name) { return; }
-        const professionals = getOwnedProfessionals(currentUser.username);
+        const professionals = getUserProfessionals(currentUser.username);
         professionals.push({ id: String(Date.now()), title: name, owner: currentUser.username });
         saveUserProfessionals(currentUser.username, professionals);
         renderEmployees();
@@ -1210,6 +1555,7 @@ function initDashboard() {
         const events = getUserEvents(currentUser.username);
         events.splice(Number(target.dataset.cancelEvent), 1);
         saveUserEvents(currentUser.username, events);
+        renderAgendamentosListaMobile(calendar.getDate());
         refreshCalendarEvents();
         renderScheduledList();
     });
@@ -1219,7 +1565,7 @@ function initDashboard() {
         if (!(target instanceof HTMLElement) || !target.dataset.removeProfessional) { return; }
         saveUserProfessionals(
             currentUser.username,
-            getOwnedProfessionals(currentUser.username).filter((professional) => professional.id !== target.dataset.removeProfessional)
+            getUserProfessionals(currentUser.username).filter((professional) => professional.id !== target.dataset.removeProfessional)
         );
         renderEmployees();
         renderProfessionalOptions();
@@ -1314,6 +1660,27 @@ function initDashboard() {
         alert("Plano atualizado com sucesso.");
     });
 
+    logoForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const logoFile = logoUpload?.files?.[0];
+        if (!logoFile) {
+            alert("Selecione uma imagem para o logo.");
+            return;
+        }
+        try {
+            const logoDataURL = await readFileAsDataURL(logoFile);
+            updateUser({
+                username: currentUser.username,
+                logo: logoDataURL
+            });
+            applyUserLogo();
+            alert("Logo enviado com sucesso!");
+            logoForm.reset();
+        } catch (err) {
+            alert("Erro ao processar a imagem. Tente novamente.");
+        }
+    });
+
     companyForm?.addEventListener("submit", (event) => {
         event.preventDefault();
         const companyName = new FormData(companyForm).get("companyName")?.toString().trim();
@@ -1322,9 +1689,9 @@ function initDashboard() {
             return;
         }
         updateUser({ username: currentUser.username, companyName });
-        currentUser.companyName = companyName;
-        renderExternalLinkPanel();
-        alert("Nome da empresa salvo com sucesso.");
+        applyUserLogo();
+        alert("Nome da empresa salvo com sucesso!");
+        companyForm.reset();
     });
 }
 
@@ -1838,7 +2205,7 @@ function initAdminDashboard() {
             email,
             phone: formData.get("phone")?.toString().trim(),
             username,
-            password: formData.get("password")?.toString().trim(),
+            password: await hashPassword(formData.get("password")?.toString().trim()),
             companyName: formData.get("name")?.toString().trim(),
             logo: logoData,
             planId: "none",
@@ -1957,6 +2324,76 @@ function initLogout() {
     });
 }
 
+
+function initMobileNav() {
+    // nav inferior mobile — conecta os botoes aos mesmos drawers do desktop
+    const navAgenda  = document.getElementById("mobile-nav-agenda");
+    const navAgendar = document.getElementById("mobile-nav-agendar");
+    const navClientes = document.getElementById("mobile-nav-clientes");
+    const navConfig  = document.getElementById("mobile-nav-config");
+    if (!navAgenda) { return; }
+
+    const navButtons = [navAgenda, navAgendar, navClientes, navConfig];
+
+    function setActiveNav(btn) {
+        navButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+    }
+
+    const navShare = document.getElementById("mobile-nav-share");
+    if (navShare) { navButtons.push(navShare); }
+
+    navAgenda.addEventListener("click", () => {
+        setActiveNav(navAgenda);
+        document.getElementById("booking-drawer")?.classList.remove("is-open");
+        document.getElementById("client-drawer")?.classList.remove("is-open");
+        document.getElementById("settings-drawer")?.classList.remove("is-open");
+        const backdrop = document.getElementById("drawer-backdrop");
+        if (backdrop) { backdrop.hidden = true; }
+    });
+
+    navAgendar.addEventListener("click", () => {
+        setActiveNav(navAgendar);
+        document.getElementById("open-booking-panel")?.click();
+    });
+
+    navClientes.addEventListener("click", () => {
+        setActiveNav(navClientes);
+        document.getElementById("open-client-panel")?.click();
+    });
+
+    navConfig.addEventListener("click", () => {
+        setActiveNav(navConfig);
+        document.getElementById("open-settings-panel")?.click();
+    });
+
+    navShare?.addEventListener("click", async () => {
+        setActiveNav(navShare);
+        const link = new URL("agendamento-publico.html", window.location.href);
+        const currentUser = getCurrentUser();
+        link.searchParams.set("user", currentUser?.username || "");
+        const linkStr = link.toString();
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: `Agende com ${currentUser?.companyName || currentUser?.name || "nos"}`,
+                    text: "Clique para agendar seu horario:",
+                    url: linkStr
+                });
+            } catch (err) { /* cancelado */ }
+        } else {
+            try {
+                await navigator.clipboard.writeText(linkStr);
+                alert("Link copiado!");
+            } catch (err) {
+                prompt("Copie o link:", linkStr);
+            }
+        }
+        // volta o estado ativo para agenda apos compartilhar
+        setTimeout(() => setActiveNav(navAgenda), 800);
+    });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     // quando a pagina abre, eu inicializo tudo que o sistema precisa
     ensureBaseData();
@@ -1969,4 +2406,5 @@ document.addEventListener("DOMContentLoaded", () => {
     initAdminDashboard();
     initMenu();
     initLogout();
+    initMobileNav();
 });
